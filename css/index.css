@@ -1,0 +1,214 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+body {
+    background: url('https://images7.alphacoders.com/539/thumb-1920-539791.jpg') center center fixed no-repeat ;
+    background-size:cover;
+    
+}
+
+.container {
+    display:grid;
+    user-select: none;  
+}
+.authors {
+    margin: 30px;
+    font-size: 20px;
+}
+.authors p {
+    font-weight: bold;
+}
+.calculator {
+    display: grid;
+    grid-template-rows: 2fr 6fr;
+    
+    /* background-color: #000; */
+    width: 1000px;
+    height: 800px;
+    margin: 90px auto;
+    border:solid 4px #021a48; 
+    border-radius: 20px;
+    /* box-shadow: 5px 5px 10px; */
+    box-shadow: 0 14px 28px rgb(0, 2, 0, 0.75);
+}
+
+.calc-screen {
+    display: grid;
+    grid-template-rows: 1fr;
+    margin: 20px;
+    padding: 10px;
+    border: solid 3px #021a48; 
+    border-radius: 20px;
+    background: #9ce9f6;
+    color: #021a48;
+    
+}
+
+.calc-display {
+    text-align: right;
+    background: #9ce9f6;
+    border-radius: 20px;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 70px;
+    cursor: pointer;
+   
+}
+
+.calc-display::selection {
+    background: none;
+  }
+
+
+.buttons {
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(6, 1fr);
+    margin: 20px;
+    justify-items: center;
+    align-items: center;
+    
+    
+}
+
+.btn {
+     width: 100%;
+    height: 100%;
+    border-radius: 34px;
+    text-align: center;
+    font-weight: bold;
+    color: #021a48;
+    font-size: 60px;
+    cursor: pointer;
+    user-select: none;
+    border: solid 3px #021a48; 
+}
+
+.result-operation-btn {
+    border-radius: 34px;
+    grid-row: span 2; 
+}
+
+.btn-0 {
+    grid-column: 1 / 3;
+} 
+
+.main-operation-btn {
+    background: #ffaf01;
+    
+}
+
+.additional-operation-btn {
+    background: #fddb24;
+    
+}
+
+.digit-btn {
+    background: #4ec1d6;
+}
+
+.digit-btn:hover{
+   border: solid 1px #fddb24; 
+}
+
+.btn:hover {
+    background-size: 100% 100%;
+    content-visibility: hidden;
+}
+
+.btn-1:hover {
+    background-image: url('images/btn-1.jpg');
+}
+
+.btn-2:hover {
+    background-image: url('images/btn-2.jpg');
+}
+
+.btn-3:hover {
+    background-image: url('images/btn-3.jpg');
+}
+
+.btn-4:hover {
+    background-image: url('images/btn-4.jpg');
+}
+
+.btn-5:hover {
+    background-image: url('images/btn-5.jpg');
+}
+
+.btn-6:hover {
+    background-image: url('images/btn-6.jpg');
+}
+
+.btn-7:hover {
+    background-image: url('images/btn-7.jpg');
+}
+
+.btn-8:hover {
+    background-image: url('images/btn-8.jpg');
+}
+
+.btn-9:hover {
+    background-image: url('images/btn-9.jpg');
+}
+
+.btn-0:hover {
+    background-image: url('images/btn-0.webp');
+}
+
+.decimal-btn:hover {
+    background-image: url('images/btn-decimal.jpg');
+    
+}
+
+.result-operation-btn:hover {
+    background-image: url('images/btn-result-2.jpg');
+    background-size: 100% 100%;
+}
+
+.devide-btn:hover {
+    background-image: url('images/devide-btn.jpg');
+}
+
+.multiply-btn:hover {
+    background-image: url('images/multiply-btn.jpg');
+}
+
+.minus-btn:hover {
+    background-image: url('images/minus-btn.jpg');
+}
+
+.plus-btn:hover {
+    background-image: url('images/plus-btn.jpg');
+}
+
+.clearAll-btn:hover {
+    background-image: url('images/clearAll-btn.jpg');
+}
+
+.delete-btn:hover {
+    background-image: url('images/delete-btn.jpg');
+}
+
+.percent-btn:hover {
+    background-image: url('images/percent-btn.jpg');
+}
+
+.power-btn:hover {
+    background-image: url('images/power-btn.jpg');
+}
+
+.square-root-btn:hover {
+    background-image: url('images/square-root-btn.jpg');
+    
+}
+
+.switch-sign-btn:hover {
+    background-image: url('images/switch-sign-btn.jpg');
+}
+
+
+
