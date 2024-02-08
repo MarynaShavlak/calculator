@@ -12,7 +12,8 @@ const ROUNDING_PRECISION = Math.pow(10, 6); // we want to round decimal part of 
 let mathOperationCode = '';
 const standardOperationsList = ['-', '+', '*', '/', '√'];
 let mathOperationBtnIsLastPressed = false;
-let savedNumber;
+let savedNumber1;
+let savedNumber2;
 let isNegativePower;
 
 resultOperationBtn.addEventListener('click', onResultBtnPress);
@@ -126,7 +127,7 @@ function accumulateDigitsOnDisplay(digitValue) {
 
 function saveFirstNumber() {
   // we need to save the number(set of accumulated digits) which we see on display
-  savedNumber = displayEl.value;
+  savedNumber1 = displayEl.value;
 }
 
 function updateMathOperationOptions(mathOperationCodeValue) {
@@ -142,7 +143,7 @@ function updateMathOperationOptions(mathOperationCodeValue) {
 }
 
 function getNumber1() {
-  return savedNumber ? Number(savedNumber) : 0;
+  return savedNumber1 ? Number(savedNumber1) : 0;
 }
 
 function getNumber2() {
