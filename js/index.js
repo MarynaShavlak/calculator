@@ -10,9 +10,10 @@ const MAX_INT_DIGITS_NEG = 16; // integer part of negative number can include no
 const MAX_DECIMAL_DIGITS = 6; // decimal part of number can include no more than 6 digits;
 const ROUNDING_PRECISION = Math.pow(10, 6); // we want to round decimal part of our result on display to 6 digits
 let mathOperationCode = '';
-const standardOperationsList = ['-', '+', '*', '/'];
+const standardOperationsList = ['-', '+', '*', '/', '√'];
 let mathOperationBtnIsLastPressed = false;
 let savedNumber;
+let isNegativePower;
 
 resultOperationBtn.addEventListener('click', onResultBtnPress);
 clearAllBtn.addEventListener('click', () => updateDisplayResult(0));
@@ -60,7 +61,10 @@ function onDigitPress(el) {
 }
 
 function onMathOperationBtnPress(el) {
-  console.log('on operation click');
+  console.log('mathOperationCode: ', mathOperationCode);
+
+  console.log('el.value: ', el.value);
+
   const isError = displayEl.value === 'ERROR';
   if (isError) {
     updateDisplayResult('');
@@ -68,7 +72,6 @@ function onMathOperationBtnPress(el) {
   }
   saveFirstNumber();
   updateMathOperationOptions(el.value);
-  console.log('el.value: ', el.value);
 }
 
 function onResultBtnPress() {
@@ -87,13 +90,11 @@ function onResultBtnPress() {
   }
   if (mathOperationCode !== '') {
     const result = calculateResult(value1, value2, mathOperationCode);
-    console.log('result : ', result);
     updateDisplayResult(result);
   }
 }
 
 function resetDisplayValueIfNeed() {
-  console.log('reset display');
   const isError = displayEl.value === 'ERROR';
   if (isError) {
     updateDisplayResult('');
@@ -126,12 +127,18 @@ function accumulateDigitsOnDisplay(digitValue) {
 function saveFirstNumber() {
   // we need to save the number(set of accumulated digits) which we see on display
   savedNumber = displayEl.value;
-  console.log('savedNumber: ', savedNumber);
 }
 
 function updateMathOperationOptions(mathOperationCodeValue) {
-  mathOperationBtnIsLastPressed = true;
-  mathOperationCode = mathOperationCodeValue;
+  console.log('mathOperationCodeValue: ', mathOperationCodeValue);
+  console.log('mathOperationCode: ', mathOperationCode);
+  if (mathOperationCode === '^' && mathOperationCodeValue === '-') {
+    isNegativePower = true;
+    console.log('треба взяти выдэмний степынь');
+  } else {
+    mathOperationBtnIsLastPressed = true;
+    mathOperationCode = mathOperationCodeValue;
+  }
 }
 
 function getNumber1() {
@@ -140,13 +147,11 @@ function getNumber1() {
 
 function getNumber2() {
   let num;
-  console.log('mathOperationCode: ', mathOperationCode);
   if (mathOperationCode === '%') {
     num = 1;
   } else {
     num = Number(displayEl.value);
   }
-  console.log('num: ', num);
   return num;
 }
 
@@ -172,7 +177,7 @@ function calculateResult(number1, number2, operation) {
     case '^':
       result = power(number1, number2);
       break;
-    case 'square-root':
+    case '√':
       result = squareRoot(number1, number2);
       break;
     default:
@@ -211,20 +216,27 @@ function divide(number1, number2) {
 }
 
 function calculatePercentage(number1, number2) {
-  console.log('number2: ', number2);
-  console.log('number1: ', number1);
   if (number1 < 0) {
     return 'ERROR';
   } else {
     const percentage = (number1 * number2) / 100;
-    console.log('percentage: ', percentage);
     return roundResult(percentage);
   }
 }
 
 function power(number1, number2) {
-  const numberInPower = Math.pow(number1, number2);
-  return roundResult(numberInPower);
+  let powerDegree = number2;
+  let result;
+  if (isNegativePower) {
+    powerDegree = number2 * -1;
+    isNegativePower = false;
+  }
+  if (powerDegree >= 0) {
+    result = Math.pow(number1, powerDegree);
+  } else {
+    result = 1 / Math.pow(number1, Math.abs(powerDegree));
+  }
+  return roundResult(result);
 }
 
 function squareRoot(number1, number2) {
