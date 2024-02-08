@@ -10,6 +10,7 @@ const MAX_INT_DIGITS_NEG = 16; // integer part of negative number can include no
 const MAX_DECIMAL_DIGITS = 6; // decimal part of number can include no more than 6 digits;
 const ROUNDING_PRECISION = Math.pow(10, 6); // we want to round decimal part of our result on display to 6 digits
 let mathOperationCode = '';
+const standardOperationsList = ['-', '+', '*', '/'];
 let mathOperationBtnIsLastPressed = false;
 let savedNumber;
 
@@ -76,9 +77,17 @@ function onResultBtnPress() {
   console.log('value1: ', value1);
   console.log('value2 : ', value2);
   console.log('mathOperationCode: ', mathOperationCode);
-
-  if (mathOperationCode) {
+  console.log('mathOperationBtnIsLastPressed: ', mathOperationBtnIsLastPressed);
+  if (
+    standardOperationsList.includes(mathOperationCode) &&
+    mathOperationBtnIsLastPressed
+  ) {
+    console.log('використано недопустимий формат');
+    return;
+  }
+  if (mathOperationCode !== '') {
     const result = calculateResult(value1, value2, mathOperationCode);
+    console.log('result : ', result);
     updateDisplayResult(result);
   }
 }
@@ -130,7 +139,15 @@ function getNumber1() {
 }
 
 function getNumber2() {
-  return Number(displayEl.value);
+  let num;
+  console.log('mathOperationCode: ', mathOperationCode);
+  if (mathOperationCode === '%') {
+    num = 1;
+  } else {
+    num = Number(displayEl.value);
+  }
+  console.log('num: ', num);
+  return num;
 }
 
 function calculateResult(number1, number2, operation) {
@@ -194,10 +211,13 @@ function divide(number1, number2) {
 }
 
 function calculatePercentage(number1, number2) {
+  console.log('number2: ', number2);
+  console.log('number1: ', number1);
   if (number1 < 0) {
     return 'ERROR';
   } else {
     const percentage = (number1 * number2) / 100;
+    console.log('percentage: ', percentage);
     return roundResult(percentage);
   }
 }
@@ -210,6 +230,9 @@ function power(number1, number2) {
 function squareRoot(number1, number2) {
   if (number1 < 0 || number2 < 0) {
     return 'ERROR';
+  } else if (number1 > 0 && number2 > 0) {
+    const squareRootValue = Math.sqrt(number2);
+    return roundResult(multiply(number1, squareRootValue));
   } else {
     const number = number1 === 0 ? number2 : number1;
     const squareRootValue = Math.sqrt(number);
