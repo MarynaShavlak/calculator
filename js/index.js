@@ -8,6 +8,7 @@ const switchSignBtn = document.querySelector('#switch-sign-btn');
 const MAX_INT_DIGITS_POS = 15; // integer part of positive number can include no more than 15 digits;
 const MAX_INT_DIGITS_NEG = 16; // integer part of negative number can include no more than 16 elements(15 digits and sign minus);
 const MAX_DECIMAL_DIGITS = 6; // decimal part of number can include no more than 6 digits;
+const ROUNDING_PRECISION = Math.pow(10, 6); // we want to round decimal part of our result on display to 6 digits
 let mathOperationCode = '';
 let mathOperationBtnIsLastPressed = false;
 let savedNumber;
@@ -30,6 +31,11 @@ buttonsTablo.addEventListener('click', function (e) {
 });
 
 function onDelBtnPress() {
+  const isError = displayEl.value === 'ERROR';
+  if (isError) {
+    updateDisplayResult('');
+    return;
+  }
   const updatedValue = displayEl.value.slice(0, -1);
   updateDisplayResult(updatedValue);
 }
@@ -54,9 +60,14 @@ function onDigitPress(el) {
 
 function onMathOperationBtnPress(el) {
   console.log('on operation click');
+  const isError = displayEl.value === 'ERROR';
+  if (isError) {
+    updateDisplayResult('');
+    return;
+  }
   saveFirstNumber();
-  changePressedMathOperationBtnFlag();
-  saveMathOperationName(el.value);
+  updateMathOperationOptions(el.value);
+  console.log('el.value: ', el.value);
 }
 
 function onResultBtnPress() {
@@ -74,6 +85,10 @@ function onResultBtnPress() {
 
 function resetDisplayValueIfNeed() {
   console.log('reset display');
+  const isError = displayEl.value === 'ERROR';
+  if (isError) {
+    updateDisplayResult('');
+  }
   if (mathOperationBtnIsLastPressed) {
     // if the last button on which user have clicked before was math operation button
     updateDisplayResult(''); // we need to delete all the digits from display
@@ -105,86 +120,100 @@ function saveFirstNumber() {
   console.log('savedNumber: ', savedNumber);
 }
 
-function changePressedMathOperationBtnFlag() {
-  // now math operation button is the last pressed button
+function updateMathOperationOptions(mathOperationCodeValue) {
   mathOperationBtnIsLastPressed = true;
-}
-
-function saveMathOperationName(mathOperationCodeValue) {
-  // we need to save information which tell us what kind of mathemetical operation last clicked mathematical operation button need to do exactly
   mathOperationCode = mathOperationCodeValue;
 }
 
 function getNumber1() {
-  // we take the value of first saved number (it was saved after clicking math operation button) not like a string but like a Number.
   return savedNumber ? Number(savedNumber) : 0;
 }
 
 function getNumber2() {
-  // we take the value of second number which will take part in calculations (we take it from display). It is not like a string but a Number.
   return Number(displayEl.value);
 }
 
 function calculateResult(number1, number2, operation) {
-  const ADDITIONAL_NUMBER_FOR_ROUNDING = Math.pow(10, 6); // we want to round decimal part of our result on display to 6 digits
-  if (operation === '+') {
-    const numbersSum = number1 + number2;
-    result =
-      Math.round(numbersSum * ADDITIONAL_NUMBER_FOR_ROUNDING) /
-      ADDITIONAL_NUMBER_FOR_ROUNDING;
-    return result;
-  } else if (operation === '-') {
-    const numbersSubstraction = number1 - number2;
-    result =
-      Math.round(numbersSubstraction * ADDITIONAL_NUMBER_FOR_ROUNDING) /
-      ADDITIONAL_NUMBER_FOR_ROUNDING;
-    return result;
-  } else if (operation === '*') {
-    const numbersMyltiplication = number1 * number2;
+  let result;
 
-    result =
-      Math.round(numbersMyltiplication * ADDITIONAL_NUMBER_FOR_ROUNDING) /
-      ADDITIONAL_NUMBER_FOR_ROUNDING;
-    return result;
-  } else if (operation === '/') {
-    if (number2 === 0) {
-      return (displayEl.value = 'ERROR'); // zero division is not possible, so it will be errors
-    } else {
-      const numbersDevision = number1 / number2;
+  switch (operation) {
+    case '+':
+      result = add(number1, number2);
+      break;
+    case '-':
+      result = subtract(number1, number2);
+      break;
+    case '*':
+      result = multiply(number1, number2);
+      break;
+    case '/':
+      result = divide(number1, number2);
+      break;
+    case '%':
+      result = calculatePercentage(number1, number2);
+      break;
+    case '^':
+      result = power(number1, number2);
+      break;
+    case 'square-root':
+      result = squareRoot(number1, number2);
+      break;
+    default:
+      result = 'Invalid operation';
+  }
 
-      result =
-        Math.round(numbersDevision * ADDITIONAL_NUMBER_FOR_ROUNDING) /
-        ADDITIONAL_NUMBER_FOR_ROUNDING;
-      return result;
-    }
-  } else if (operation === '%') {
-    if (number1 < 0) {
-      return (displayEl.value = 'ERROR'); // % can not be negative
-    } else {
-      const numberPercent = (number1 * number2) / 100;
+  return result;
+}
 
-      result =
-        Math.round(numberPercent * ADDITIONAL_NUMBER_FOR_ROUNDING) /
-        ADDITIONAL_NUMBER_FOR_ROUNDING;
-      return result;
-    }
-  } else if (operation === '^') {
-    const numberInPOwer = Math.pow(number1, number2);
+function roundResult(value) {
+  return Math.round(value * ROUNDING_PRECISION) / ROUNDING_PRECISION;
+}
 
-    result =
-      Math.round(numberInPOwer * ADDITIONAL_NUMBER_FOR_ROUNDING) /
-      ADDITIONAL_NUMBER_FOR_ROUNDING;
-    return result;
-  } else if (operation === 'square-root') {
-    if (number1 <= 0) {
-      return (displayEl.value = 'ERROR'); // square root can be calculated only for positive numbers
-    } else {
-      const numberSquareRoot = Math.sqrt(number1);
-      result =
-        Math.round(numberSquareRoot * ADDITIONAL_NUMBER_FOR_ROUNDING) /
-        ADDITIONAL_NUMBER_FOR_ROUNDING;
-      return result;
-    }
+function add(number1, number2) {
+  const numbersSum = number1 + number2;
+  return roundResult(numbersSum);
+}
+
+function subtract(number1, number2) {
+  const numbersSubtraction = number1 - number2;
+  return roundResult(numbersSubtraction);
+}
+
+function multiply(number1, number2) {
+  const numbersMultiplication = number1 * number2;
+  return roundResult(numbersMultiplication);
+}
+
+function divide(number1, number2) {
+  if (number2 === 0) {
+    return 'ERROR';
+  } else {
+    const numbersDivision = number1 / number2;
+    return roundResult(numbersDivision);
+  }
+}
+
+function calculatePercentage(number1, number2) {
+  if (number1 < 0) {
+    return 'ERROR';
+  } else {
+    const percentage = (number1 * number2) / 100;
+    return roundResult(percentage);
+  }
+}
+
+function power(number1, number2) {
+  const numberInPower = Math.pow(number1, number2);
+  return roundResult(numberInPower);
+}
+
+function squareRoot(number1, number2) {
+  if (number1 < 0 || number2 < 0) {
+    return 'ERROR';
+  } else {
+    const number = number1 === 0 ? number2 : number1;
+    const squareRootValue = Math.sqrt(number);
+    return roundResult(squareRootValue);
   }
 }
 
