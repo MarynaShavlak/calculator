@@ -112,9 +112,24 @@ function onDecimalBtnPress(e) {
 }
 
 function checkIfMathOperationStarted() {
-  return (isSignBefore = fullOperationsList.includes(
-    displayEl.value.slice(-1),
-  ));
+  //   console.log('LAST SIGN IN TABLO: ', displayEl.value.slice(-1));
+  //   return (isSignBefore = fullOperationsList.includes(
+  //     displayEl.value.slice(-1),
+  //   ));
+  let isSignBefore = false;
+  const value = displayEl.value;
+
+  for (let i = 1; i < value.length; i++) {
+    if (fullOperationsList.includes(value[i])) {
+      isSignBefore = true;
+      break;
+    }
+  }
+  return isSignBefore;
+}
+
+function checkIfRootOperationStarted() {
+  return displayEl.value.includes('√') && mathOperationCode !== '√';
 }
 
 function isError() {
@@ -162,12 +177,12 @@ function onMathOperationBtnPress(el) {
   }
 
   if (isOperationWithoutFirstOperand(clickedSign)) {
-    handleOperationWithFirstOperand();
+    handleOperationWithoutFirstOperand();
     return;
   }
 
   if (isSquareRootOperation(clickedSign)) {
-    handleSquareRootOperation(clickedSign);
+    handleSquareRootDisplay(clickedSign);
     return;
   }
   updateMathOperationOptions(clickedSign);
@@ -175,51 +190,33 @@ function onMathOperationBtnPress(el) {
 }
 
 function onResultBtnPress() {
-  //   const value1 = getNumber1();
-  //   const value2 = getNumber2();
   const value1 = getNumber1();
   const value2 = getNumber2();
   console.log('value1: ', value1);
   console.log('value2 : ', value2);
   console.log('mathOperationCode: ', mathOperationCode);
   console.log('mathOperationBtnIsLastPressed: ', mathOperationBtnIsLastPressed);
-  if (
-    standardOperationsList.includes(mathOperationCode) &&
-    mathOperationBtnIsLastPressed
-  ) {
-    console.log(
-      'недопустимий формат: немає другого числа для проведення розрахунків',
-    );
-    showNotification();
-    return;
+  if (isOperationWithoutSecondOperand()) {
+    handleOperationWithoutSecondOperand();
+  } else {
+    handleOperationWithTwoOperands(value1, value2);
   }
-  if (mathOperationCode !== '') {
-    const isRootOnDispay =
-      displayEl.value.includes('√') && mathOperationCode !== '√';
-    console.log('isRootonDispay: ', isRootOnDispay);
-    if (isRootOnDispay) {
-      console.log('clikc on = ', mathOperationCode);
-      const number2 = calculateResult(0, value2, '√');
-      console.log('number2: ', number2);
-      const result = calculateResult(value1, number2, mathOperationCode);
-      console.log('result: ', result);
-      updateDisplayResult(result);
-      savedNumber1 = result;
-      savedNumber2 = '';
-      return;
-    }
 
-    console.log('clikc on = ', mathOperationCode);
-    const result = calculateResult(value1, value2, mathOperationCode);
-    console.log('result: ', result);
-    updateDisplayResult(result);
-    savedNumber1 = result;
-    savedNumber2 = '';
-  }
   console.log('on =  click savedNumber1: ', savedNumber1);
   console.log(' on = clikc savedNumber2: ', savedNumber2);
-  mathOperationBtnIsLastPressed = false;
-  mathOperationCode = '';
+  resetOperationState();
+}
+
+function handleOperationWithTwoOperands(value1, value2) {
+  if (mathOperationCode !== '') {
+    const isRootOnDispay = checkIfRootOperationStarted();
+    console.log('isRootonDispay: ', isRootOnDispay);
+    if (isRootOnDispay) {
+      handleRootOperation(value1, value2);
+    } else {
+      handleRegularOperation(value1, value2);
+    }
+  }
 }
 
 function resetDisplayValueIfNeed() {
@@ -231,45 +228,74 @@ function resetDisplayValueIfNeed() {
     // if the last button on which user have clicked before was math operation button
     // updateDisplayResult(''); // we need to delete all the digits from display
     // updateDisplayResult(`${savedNumber1}${mathOperationCode}`); // !!!!!!!!!!!!!!!!add new
-    mathOperationBtnIsLastPressed = false; // now math operation button is not the last  pressed button anymore, so we need to reset variable flag to origin state
+    mathOperationBtnIsLastPressed = false;
+    // now math operation button is not the last  pressed button anymore, so we need to reset variable flag to origin state
   }
 }
 
+function resetOperationState() {
+  mathOperationBtnIsLastPressed = false;
+  mathOperationCode = '';
+}
+
 function accumulateDigitsOnDisplay(digitValue) {
-  console.log('aacamulate function');
+  console.log('START ACCUMULATE');
   if (displayEl.value === '0') {
-    //if it is only digit-zero on display now, we need to delete this digit from display
-    savedNumber1 = digitValue;
-    updateDisplayResult(digitValue);
+    handleFirstDigitClick(digitValue);
     return;
   }
+  console.log(' IN ACCUMULATE is savedNumber2 : ', savedNumber2);
 
-  console.log('displayEl.value: ', displayEl.value);
   const isFistNumberNegative = displayEl.value.startsWith('-');
-  const isOperationOnDisplay = fullOperationsList.some(operation =>
-    displayEl.value.includes(operation),
-  );
+  const isOperationOnDisplay = checkIfMathOperationStarted();
   console.log('isOperationOnDisplay: ', isOperationOnDisplay);
   console.log('isFistNumberNegative: ', isFistNumberNegative);
 
   let accamulatedValue;
   if (isOperationOnDisplay) {
-    // savedNumber2 = digitValue;
-    accamulatedValue = savedNumber2 + digitValue;
-    console.log('accamulatedValue : ', accamulatedValue);
-    const isPositiveNumber = accamulatedValue >= 0;
-    let res;
-    if (isPositiveNumber) {
-      res = handlePositiveNumber(accamulatedValue);
+    if (!isFistNumberNegative) {
+      // savedNumber2 = digitValue;
+      accamulatedValue = savedNumber2 + digitValue;
+      console.log('first POSITIVE accamulatedValue : ', accamulatedValue);
+      const isPositiveNumber = accamulatedValue >= 0;
+      let res;
+      if (isPositiveNumber) {
+        res = handlePositiveNumber(accamulatedValue);
+      } else {
+        res = handleNegativeNumber(accamulatedValue);
+      }
+      console.log('first POSITIVE res : ', res);
+      savedNumber2 = res;
+      console.log('first POSITIVE savedNumber1: ', savedNumber1);
+      console.log(' first POSITIVE savedNumber2: ', savedNumber2);
+      updateDisplayResult(`${displayEl.value}${digitValue}`);
     } else {
-      res = handleNegativeNumber(accamulatedValue);
+      console.log('перше число негативне');
+      accamulatedValue = savedNumber2 + digitValue;
+      console.log(
+        'накопичений ДРУГИЙ операнд, якщо перший негативний',
+        accamulatedValue,
+      );
+      const isPositiveNumber = accamulatedValue >= 0;
+      console.log('isPositiveNumber: ', isPositiveNumber);
+      let res;
+      if (isPositiveNumber) {
+        res = handlePositiveNumber(accamulatedValue);
+      } else {
+        res = handleNegativeNumber(accamulatedValue);
+      }
+      console.log(
+        'накопичений ДРУГИЙ операнд, якщо перший негативний ПІСЛЯ ОБРОБКИ: ',
+        res,
+      );
+      savedNumber2 = res;
+      //   console.log('savedNumber2: ', savedNumber2);
+      updateDisplayResult(`${displayEl.value}${digitValue}`);
+      console.log('if first NEGATIVE savedNumber1: ', savedNumber1);
+      console.log('if first NEGATIVE savedNumber2: ', savedNumber2);
     }
-    console.log('res : ', res);
-    savedNumber2 = res;
-    console.log('savedNumber1: ', savedNumber1);
-    console.log(' savedNumber2: ', savedNumber2);
-    updateDisplayResult(`${displayEl.value}${digitValue}`);
   } else {
+    console.log('displayEl.value: ', displayEl.value);
     accamulatedValue = displayEl.value + digitValue;
     console.log('accamulatedValue : ', accamulatedValue);
     const isPositiveNumber = accamulatedValue >= 0;
@@ -417,6 +443,7 @@ function squareRoot(number1, number2) {
 }
 
 function updateDisplayResult(value) {
+  console.log('UPDATE DISPLAY value: ', value);
   displayEl.value = value;
 }
 
@@ -509,9 +536,23 @@ function isOperationWithoutFirstOperand(clickedSign) {
   return mathOperationCode === '' && clickedSign !== '√' && !savedNumber1;
 }
 
-function handleOperationWithFirstOperand() {
+function handleOperationWithoutFirstOperand() {
   console.log(
     'недопустимий формат: не можна проводити додавання, віднімання, множення, ділення, розрахунок відсотка та підняття до степеня, не маючи першого операнда',
+  );
+  showNotification();
+}
+
+function isOperationWithoutSecondOperand() {
+  return (
+    standardOperationsList.includes(mathOperationCode) &&
+    mathOperationBtnIsLastPressed
+  );
+}
+
+function handleOperationWithoutSecondOperand() {
+  console.log(
+    'недопустимий формат: немає другого числа для проведення розрахунків',
   );
   showNotification();
 }
@@ -524,11 +565,50 @@ function isSquareRootOperation(clickedSign) {
   );
 }
 
-function handleSquareRootOperation(clickedSign) {
+function handleSquareRootDisplay(clickedSign) {
   console.log(
     'тут треба зробити операцію із першим числом та результатом кореня другого',
   );
   console.log('savedNumber1: ', savedNumber1);
   console.log(' savedNumber2: ', savedNumber2);
   updateDisplayResult(`${savedNumber1}${mathOperationCode}${clickedSign}`);
+}
+
+function handleRootOperation(value1, value2) {
+  console.log(
+    'when click on "=" and IS ROOT, the sign of operation is',
+    mathOperationCode,
+  );
+  const number2 = calculateResult(0, value2, '√');
+  console.log('IT IS SQUARE ROOT: ', number2);
+  const result = calculateResult(value1, number2, mathOperationCode);
+  console.log(
+    'when click on "=" and IS ROOT, the result of operation is ',
+    result,
+  );
+  updateDisplayResult(result);
+  savedNumber1 = result;
+  savedNumber2 = '';
+}
+
+function handleRegularOperation(value1, value2) {
+  console.log('IN handleRegularOperation value1: ', value1);
+  console.log('IN handleRegularOperation value2: ', value2);
+  console.log(
+    'when click on "=" and NO ROOT, the sign of operation is',
+    mathOperationCode,
+  );
+  const result = calculateResult(value1, value2, mathOperationCode);
+  console.log(
+    'when click on "=" and NO ROOT, the result of operation is ',
+    result,
+  );
+  updateDisplayResult(result);
+  savedNumber1 = result;
+  savedNumber2 = '';
+}
+
+function handleFirstDigitClick(digitValue) {
+  savedNumber1 = digitValue;
+  updateDisplayResult(digitValue);
 }
