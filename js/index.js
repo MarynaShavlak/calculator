@@ -253,65 +253,79 @@ function accumulateDigitsOnDisplay(digitValue) {
 
   let accamulatedValue;
   if (isOperationOnDisplay) {
-    if (!isFistNumberNegative) {
-      // savedNumber2 = digitValue;
-      accamulatedValue = savedNumber2 + digitValue;
-      console.log('first POSITIVE accamulatedValue : ', accamulatedValue);
-      const isPositiveNumber = accamulatedValue >= 0;
-      let res;
-      if (isPositiveNumber) {
-        res = handlePositiveNumber(accamulatedValue);
-      } else {
-        res = handleNegativeNumber(accamulatedValue);
-      }
-      console.log('first POSITIVE res : ', res);
-      savedNumber2 = res;
-      console.log('first POSITIVE savedNumber1: ', savedNumber1);
-      console.log(' first POSITIVE savedNumber2: ', savedNumber2);
-      updateDisplayResult(`${displayEl.value}${digitValue}`);
-    } else {
-      console.log('перше число негативне');
-      accamulatedValue = savedNumber2 + digitValue;
-      console.log(
-        'накопичений ДРУГИЙ операнд, якщо перший негативний',
-        accamulatedValue,
-      );
-      const isPositiveNumber = accamulatedValue >= 0;
-      console.log('isPositiveNumber: ', isPositiveNumber);
-      let res;
-      if (isPositiveNumber) {
-        res = handlePositiveNumber(accamulatedValue);
-      } else {
-        res = handleNegativeNumber(accamulatedValue);
-      }
-      console.log(
-        'накопичений ДРУГИЙ операнд, якщо перший негативний ПІСЛЯ ОБРОБКИ: ',
-        res,
-      );
-      savedNumber2 = res;
-      //   console.log('savedNumber2: ', savedNumber2);
-      updateDisplayResult(`${displayEl.value}${digitValue}`);
-      console.log('if first NEGATIVE savedNumber1: ', savedNumber1);
-      console.log('if first NEGATIVE savedNumber2: ', savedNumber2);
-    }
+    accululateWithOperSignOnDisplay(isFistNumberNegative, digitValue);
+    // if (!isFistNumberNegative) {
+    //   // savedNumber2 = digitValue;
+    //   accamulatedValue = savedNumber2 + digitValue;
+    //   console.log('first POSITIVE accamulatedValue : ', accamulatedValue);
+    //   const res = processAccumulatedValue(accamulatedValue);
+    //   console.log('first POSITIVE res : ', res);
+    //   savedNumber2 = res;
+    //   console.log('first POSITIVE savedNumber1: ', savedNumber1);
+    //   console.log(' first POSITIVE savedNumber2: ', savedNumber2);
+    //   updateDisplayResult(`${displayEl.value}${digitValue}`);
+    // } else {
+    //   console.log('перше число негативне');
+    //   accamulatedValue = savedNumber2 + digitValue;
+    //   console.log(
+    //     'накопичений ДРУГИЙ операнд, якщо перший негативний',
+    //     accamulatedValue,
+    //   );
+    //   const res = processAccumulatedValue(accamulatedValue);
+    //   console.log(
+    //     'накопичений ДРУГИЙ операнд, якщо перший негативний ПІСЛЯ ОБРОБКИ: ',
+    //     res,
+    //   );
+    //   savedNumber2 = res;
+    //   //   console.log('savedNumber2: ', savedNumber2);
+    //   updateDisplayResult(`${displayEl.value}${digitValue}`);
+    //   console.log('if first NEGATIVE savedNumber1: ', savedNumber1);
+    //   console.log('if first NEGATIVE savedNumber2: ', savedNumber2);
+    // }
   } else {
     console.log('displayEl.value: ', displayEl.value);
     accamulatedValue = displayEl.value + digitValue;
     console.log('accamulatedValue : ', accamulatedValue);
-    const isPositiveNumber = accamulatedValue >= 0;
-    console.log('isPositiveNumber: ', isPositiveNumber);
-    let res;
-    if (isPositiveNumber) {
-      res = handlePositiveNumber(accamulatedValue);
-    } else {
-      res = handleNegativeNumber(accamulatedValue);
-    }
+    const res = processAccumulatedValue(accamulatedValue);
     console.log('res : ', res);
     savedNumber1 = res;
     console.log('savedNumber1: ', savedNumber1);
     console.log(' savedNumber2: ', savedNumber2);
     updateDisplayResult(`${res}`);
   }
+}
+
+function accululateWithOperSignOnDisplay(isFistNumberNegative, digitValue) {
+  if (!isFistNumberNegative) {
+    accamulatedValue = savedNumber2 + digitValue;
+    const res = processAccumulatedValue(accamulatedValue);
+    console.log('second operand if first is POSITIVE: ', res);
+    savedNumber2 = res;
+    console.log('first OPERAND: ', savedNumber1);
+    console.log(' second OPERAND: ', savedNumber2);
+    updateDisplayResult(`${displayEl.value}${digitValue}`);
+  } else {
+    accamulatedValue = savedNumber2 + digitValue;
+    const res = processAccumulatedValue(accamulatedValue);
+    console.log('second operand if first is NEGATIVE:', res);
+    savedNumber2 = res;
+    updateDisplayResult(`${displayEl.value}${digitValue}`);
+    console.log('if first NEGATIVE savedNumber1: ', savedNumber1);
+    console.log('if first NEGATIVE savedNumber2: ', savedNumber2);
+  }
+}
+
+function processAccumulatedValue(value) {
+  console.log('accamulatedValue : ', value);
+  const isPositiveNumber = value >= 0;
+  console.log('isPositiveNumber: ', isPositiveNumber);
+  let result;
+  if (isPositiveNumber) {
+    result = handlePositiveNumber(value);
+  } else {
+    result = handleNegativeNumber(value);
+  }
+  return result;
 }
 
 // function saveFirstNumber() {
