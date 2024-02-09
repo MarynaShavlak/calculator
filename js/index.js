@@ -12,16 +12,16 @@ const MAX_INT_DIGITS_POS = 15; // integer part of positive number can include no
 const MAX_INT_DIGITS_NEG = 16; // integer part of negative number can include no more than 16 elements(15 digits and sign minus);
 const MAX_DECIMAL_DIGITS = 6; // decimal part of number can include no more than 6 digits;
 const ROUNDING_PRECISION = Math.pow(10, 6); // we want to round decimal part of our result on display to 6 digits
-let mathOperationCode = '';
 const fullOperationsList = ['-', '+', '*', '/', '√', '%', '^'];
 const standardOperationsList = ['-', '+', '*', '/', '√'];
 let mathOperationBtnIsLastPressed = false;
+let mathOperationCode = '';
 let savedNumber1 = '';
 let savedNumber2 = '';
 let isNegativePower;
 
 resultOperationBtn.addEventListener('click', onResultBtnPress);
-clearAllBtn.addEventListener('click', () => updateDisplayResult(0));
+clearAllBtn.addEventListener('click', resetCalculator);
 deleteBtn.addEventListener('click', onDelBtnPress);
 decimalBtn.addEventListener('click', onDecimalBtnPress);
 switchSignBtn.addEventListener('click', onSwitchSignBtnPress);
@@ -38,6 +38,15 @@ buttonsTablo.addEventListener('click', function (e) {
 });
 
 notificationEl.addEventListener('click', onNotificationClick);
+
+function resetCalculator() {
+  updateDisplayResult(0);
+  mathOperationBtnIsLastPressed = false;
+  mathOperationCode = '';
+  savedNumber1 = '';
+  savedNumber2 = '';
+  isNegativePower = false;
+}
 
 function onNotificationClick() {
   hideNotification();
@@ -222,6 +231,8 @@ function onResultBtnPress() {
   }
   console.log('on =  click savedNumber1: ', savedNumber1);
   console.log(' on = clikc savedNumber2: ', savedNumber2);
+  mathOperationBtnIsLastPressed = false;
+  mathOperationCode = '';
 }
 
 function resetDisplayValueIfNeed() {
