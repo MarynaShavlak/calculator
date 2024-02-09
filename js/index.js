@@ -54,7 +54,33 @@ function onDelBtnPress() {
     return;
   }
   const updatedValue = displayEl.value.slice(0, -1);
+  console.log('updatedValue: ', updatedValue);
   updateDisplayResult(updatedValue);
+
+  console.log('mathOperationCode: ', mathOperationCode);
+  console.log('savedNumber1: ', savedNumber1);
+  console.log('savedNumber2: ', savedNumber2);
+  if (!savedNumber2) {
+    console.log('другого операнда немаэ');
+    savedNumber1 = updatedValue;
+    resetOperationState();
+  } else {
+    console.log('є другий операнд');
+    const isSignBefore = checkIfMathOperationStarted();
+    console.log('в кінці тільки знак ', isSignBefore);
+    if (isSignBefore && savedNumber2.length < 2) {
+      const sign = displayEl.value.slice(-1);
+      updateMathOperationOptions(sign);
+
+      console.log('sign: ', sign);
+      savedNumber2 = '';
+    } else {
+      savedNumber2 = savedNumber2.slice(0, savedNumber2.length - 1);
+    }
+  }
+  console.log('AFTER DELETION savedNumber1: ', savedNumber1);
+  console.log('AFTER DELETION savedNumber2: ', savedNumber2);
+  console.log('AFTER DELETION mathOperationCode: ', mathOperationCode);
 }
 
 //__________________float numbers functins_________________//
@@ -103,6 +129,7 @@ function handleDecimalInSecondOperand() {
 function checkIfMathOperationStarted() {
   let isSignBefore = false;
   const value = displayEl.value;
+  console.log('value: ', value);
 
   for (let i = 1; i < value.length; i++) {
     if (fullOperationsList.includes(value[i])) {
