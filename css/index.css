@@ -2,21 +2,60 @@
   margin: 0;
   padding: 0;
   border: none;
+  box-sizing: border-box;
 }
 
 body {
   background: url('https://images7.alphacoders.com/539/thumb-1920-539791.jpg')
     center center fixed no-repeat;
   background-size: cover;
+  overflow: hidden;
 }
 
 .container {
+  position: relative;
   display: grid;
   user-select: none;
 }
+
+/* Notification  */
+.error-notification-modal {
+  display: flex;
+  position: absolute;
+  padding: 30px;
+  bottom: -110px;
+  right: 0;
+  width: 500px;
+  border-radius: 5px;
+  transform: translateX(100%);
+
+  background-color: #fff;
+  color: red;
+  cursor: pointer;
+  transition: all 300ms cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+.error-notification-modal.isVisible {
+  bottom: -110px;
+  right: 0;
+  width: 500px;
+  transform: translateX(-10px);
+}
+.error-notification-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+}
+.error-notification-text {
+  padding-left: 100px;
+  font-size: 30px;
+}
+
 .authors {
+  position: absolute;
+  bottom: 0;
   margin: 30px;
-  font-size: 20px;
+  font-size: 14px;
 }
 .authors p {
   font-weight: bold;
@@ -26,7 +65,8 @@ body {
   grid-template-rows: 2fr 6fr;
   width: 1000px;
   height: 800px;
-  margin: 90px auto;
+  margin: 0 auto;
+  margin-top: 30px;
   border: solid 4px #021a48;
   border-radius: 20px;
   box-shadow: 0 14px 28px rgb(0, 2, 0, 0.75);
@@ -110,90 +150,90 @@ body {
 }
 
 .btn-1:hover {
-  background-image: url('images/btn-1.jpg');
+  background-image: url('../images/btn-1.jpg');
 }
 
 .btn-2:hover {
-  background-image: url('images/btn-2.jpg');
+  background-image: url('../images/btn-2.jpg');
 }
 
 .btn-3:hover {
-  background-image: url('images/btn-3.jpg');
+  background-image: url('../images/btn-3.jpg');
 }
 
 .btn-4:hover {
-  background-image: url('images/btn-4.jpg');
+  background-image: url('../images/btn-4.jpg');
 }
 
 .btn-5:hover {
-  background-image: url('images/btn-5.jpg');
+  background-image: url('../images/btn-5.jpg');
 }
 
 .btn-6:hover {
-  background-image: url('images/btn-6.jpg');
+  background-image: url('../images/btn-6.jpg');
 }
 
 .btn-7:hover {
-  background-image: url('images/btn-7.jpg');
+  background-image: url('../images/btn-7.jpg');
 }
 
 .btn-8:hover {
-  background-image: url('images/btn-8.jpg');
+  background-image: url('../images/btn-8.jpg');
 }
 
 .btn-9:hover {
-  background-image: url('images/btn-9.jpg');
+  background-image: url('../images/btn-9.jpg');
 }
 
 .btn-0:hover {
-  background-image: url('images/btn-0.webp');
+  background-image: url('../images/btn-0.webp');
 }
 
 .decimal-btn:hover {
-  background-image: url('images/btn-decimal.jpg');
+  background-image: url('../images/btn-decimal.jpg');
 }
 
 .result-operation-btn:hover {
-  background-image: url('images/btn-result-2.jpg');
+  background-image: url('../images/btn-result-2.jpg');
   background-size: 100% 100%;
 }
 
 .devide-btn:hover {
-  background-image: url('images/devide-btn.jpg');
+  background-image: url('../images/devide-btn.jpg');
 }
 
 .multiply-btn:hover {
-  background-image: url('images/multiply-btn.jpg');
+  background-image: url('../images/multiply-btn.jpg');
 }
 
 .minus-btn:hover {
-  background-image: url('images/minus-btn.jpg');
+  background-image: url('../images/minus-btn.jpg');
 }
 
 .plus-btn:hover {
-  background-image: url('images/plus-btn.jpg');
+  background-image: url('../images/plus-btn.jpg');
 }
 
 .clearAll-btn:hover {
-  background-image: url('images/clearAll-btn.jpg');
+  background-image: url('../images/clearAll-btn.jpg');
 }
 
 .delete-btn:hover {
-  background-image: url('images/delete-btn.jpg');
+  background-image: url('../images/delete-btn.jpg');
 }
 
 .percent-btn:hover {
-  background-image: url('images/percent-btn.jpg');
+  background-image: url('../images/percent-btn.jpg');
 }
 
 .power-btn:hover {
-  background-image: url('images/power-btn.jpg');
+  background-image: url('../images/power-btn.jpg');
 }
 
 .square-root-btn:hover {
-  background-image: url('images/square-root-btn.jpg');
+  background-image: url('../images/square-root-btn.jpg');
 }
 
 .switch-sign-btn:hover {
-  background-image: url('images/switch-sign-btn.jpg');
+  background-image: url('../images/switch-sign-btn.jpg');
 }

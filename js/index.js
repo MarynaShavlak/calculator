@@ -1,3 +1,6 @@
+const NOTIFICATION_DELAY = 3000;
+let timeoutID = null;
+const notificationEl = document.querySelector('.error-notification-modal');
 const displayEl = document.querySelector('#main-calc-display');
 const buttonsTablo = document.querySelector('.buttons-tablo');
 const resultOperationBtn = document.querySelector('#result-btn');
@@ -10,10 +13,11 @@ const MAX_INT_DIGITS_NEG = 16; // integer part of negative number can include no
 const MAX_DECIMAL_DIGITS = 6; // decimal part of number can include no more than 6 digits;
 const ROUNDING_PRECISION = Math.pow(10, 6); // we want to round decimal part of our result on display to 6 digits
 let mathOperationCode = '';
+const fullOperationsList = ['-', '+', '*', '/', '√', '%', '^'];
 const standardOperationsList = ['-', '+', '*', '/', '√'];
 let mathOperationBtnIsLastPressed = false;
 let savedNumber1;
-let savedNumber2;
+let savedNumber2 = '';
 let isNegativePower;
 
 resultOperationBtn.addEventListener('click', onResultBtnPress);
@@ -32,6 +36,24 @@ buttonsTablo.addEventListener('click', function (e) {
     onMathOperationBtnPress(clickedEl);
   }
 });
+
+notificationEl.addEventListener('click', onNotificationClick);
+
+function onNotificationClick() {
+  hideNotification();
+  clearTimeout(timeoutID);
+}
+
+function showNotification() {
+  notificationEl.classList.add('isVisible');
+  timeoutID = setTimeout(() => {
+    hideNotification();
+  }, NOTIFICATION_DELAY);
+}
+
+function hideNotification() {
+  notificationEl.classList.remove('isVisible');
+}
 
 function onDelBtnPress() {
   const isError = displayEl.value === 'ERROR';
@@ -63,9 +85,7 @@ function onDigitPress(el) {
 
 function onMathOperationBtnPress(el) {
   console.log('mathOperationCode: ', mathOperationCode);
-
   console.log('el.value: ', el.value);
-
   const isError = displayEl.value === 'ERROR';
   if (isError) {
     updateDisplayResult('');
@@ -73,6 +93,7 @@ function onMathOperationBtnPress(el) {
   }
   saveFirstNumber();
   updateMathOperationOptions(el.value);
+  updateDisplayResult(`${savedNumber1}${mathOperationCode}`); // !!!!!!!!!!!!!!!!add new
 }
 
 function onResultBtnPress() {
@@ -87,12 +108,18 @@ function onResultBtnPress() {
     mathOperationBtnIsLastPressed
   ) {
     console.log('використано недопустимий формат');
+    showNotification();
+    console.log('after');
     return;
   }
   if (mathOperationCode !== '') {
     const result = calculateResult(value1, value2, mathOperationCode);
     updateDisplayResult(result);
+    savedNumber1 = result;
+    savedNumber2 = '';
   }
+  console.log('on =  click savedNumber1: ', savedNumber1);
+  console.log(' on = clikc savedNumber2: ', savedNumber2);
 }
 
 function resetDisplayValueIfNeed() {
@@ -102,7 +129,8 @@ function resetDisplayValueIfNeed() {
   }
   if (mathOperationBtnIsLastPressed) {
     // if the last button on which user have clicked before was math operation button
-    updateDisplayResult(''); // we need to delete all the digits from display
+    // updateDisplayResult(''); // we need to delete all the digits from display
+    // updateDisplayResult(`${savedNumber1}${mathOperationCode}`); // !!!!!!!!!!!!!!!!add new
     mathOperationBtnIsLastPressed = false; // now math operation button is not the last  pressed button anymore, so we need to reset variable flag to origin state
   }
 }
@@ -114,6 +142,11 @@ function accumulateDigitsOnDisplay(digitValue) {
     return;
   }
 
+  const includesMathSigns = fullOperationsList.some(operation =>
+    displayEl.value.includes(operation),
+  );
+
+  console.log('includesMathSigns: ', includesMathSigns);
   const result = displayEl.value + digitValue; // we need to accumulate digits on display, every new pressed digit is added in the end of display
   const isPositiveNumber = result >= 0;
   let res;
@@ -122,7 +155,12 @@ function accumulateDigitsOnDisplay(digitValue) {
   } else {
     res = handleNegativeNumber(result, matchInNegativeNumber);
   }
-  updateDisplayResult(res);
+  console.log('res: ', res);
+  updateDisplayResult(`${res}`);
+  if (includesMathSigns) {
+    savedNumber2 += digitValue;
+  }
+  console.log('savedNumber2: ', savedNumber2);
 }
 
 function saveFirstNumber() {
@@ -135,7 +173,6 @@ function updateMathOperationOptions(mathOperationCodeValue) {
   console.log('mathOperationCode: ', mathOperationCode);
   if (mathOperationCode === '^' && mathOperationCodeValue === '-') {
     isNegativePower = true;
-    console.log('треба взяти выдэмний степынь');
   } else {
     mathOperationBtnIsLastPressed = true;
     mathOperationCode = mathOperationCodeValue;
@@ -151,7 +188,7 @@ function getNumber2() {
   if (mathOperationCode === '%') {
     num = 1;
   } else {
-    num = Number(displayEl.value);
+    num = Number(savedNumber2);
   }
   return num;
 }
