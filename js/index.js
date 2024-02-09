@@ -16,7 +16,7 @@ let mathOperationCode = '';
 const fullOperationsList = ['-', '+', '*', '/', '√', '%', '^'];
 const standardOperationsList = ['-', '+', '*', '/', '√'];
 let mathOperationBtnIsLastPressed = false;
-let savedNumber1;
+let savedNumber1 = '';
 let savedNumber2 = '';
 let isNegativePower;
 
@@ -66,16 +66,38 @@ function onDelBtnPress() {
 }
 
 function onDecimalBtnPress(e) {
+  console.log('savedNumber1: ', savedNumber1);
+  console.log(' savedNumber2: ', savedNumber2);
   const el = e.target;
-  const isDecimalSeparatorIncludedOnDisplay = displayEl.value.includes('.');
-  if (!isDecimalSeparatorIncludedOnDisplay) {
+  //   const isDecimalSeparatorIncludedOnDisplay = displayEl.value.includes('.');
+  const isDecimalSeparatorInFirstNumber =
+    savedNumber1 && String(savedNumber1).includes('.');
+  const isDecimalSeparatorInSecondNumber =
+    savedNumber2 && String(savedNumber2).includes('.');
+  if (!isDecimalSeparatorInFirstNumber) {
     displayEl.value += el.value;
+    savedNumber1 += el.value;
+    console.log('savedNumber1: ', savedNumber1);
+    console.log(' savedNumber2: ', savedNumber2);
+    return;
+  }
+  if (!isDecimalSeparatorInSecondNumber) {
+    displayEl.value += el.value;
+    savedNumber2 += el.value;
+    console.log('savedNumber1: ', savedNumber1);
+    console.log(' savedNumber2: ', savedNumber2);
   }
 }
 
 function onSwitchSignBtnPress() {
-  if (displayEl.value === '0') return;
+  if (displayEl.value === '0') {
+    console.log('використано недопустимий формат');
+    showNotification();
+    return;
+  }
   displayEl.value *= -1;
+  savedNumber1 *= -1;
+  console.log('after SIGN SWITCH savedNumber1: ', savedNumber1);
 }
 
 function onDigitPress(el) {
@@ -84,21 +106,63 @@ function onDigitPress(el) {
 }
 
 function onMathOperationBtnPress(el) {
-  console.log('mathOperationCode: ', mathOperationCode);
-  console.log('el.value: ', el.value);
+  const clickedSign = el.value;
+  console.log('clickedSign: ', clickedSign);
+  if (mathOperationCode === clickedSign) {
+    return;
+  }
+
   const isError = displayEl.value === 'ERROR';
   if (isError) {
     updateDisplayResult('');
     return;
   }
-  saveFirstNumber();
-  updateMathOperationOptions(el.value);
+  if (
+    (mathOperationCode !== '' && clickedSign === '%') ||
+    clickedSign === '^'
+  ) {
+    console.log(
+      'недопустимий формат: після знаіків математичних операцій на можна ставити % та ^',
+    );
+    showNotification();
+    return;
+  }
+
+  console.log('mathOperationCode: ', mathOperationCode);
+  if (mathOperationCode === '' && clickedSign !== '√' && !savedNumber1) {
+    console.log(
+      'недопустимий формат: не можна проводити операції не маючи першого операнда',
+    );
+    showNotification();
+    return;
+  }
+
+  if (
+    mathOperationCode &&
+    clickedSign === '√' &&
+    mathOperationCode !== clickedSign
+  ) {
+    console.log(
+      'тут треба зробити операцію із першим числом та результатом кореня другого',
+    );
+    console.log('savedNumber1: ', savedNumber1);
+    console.log(' savedNumber2: ', savedNumber2);
+    updateDisplayResult(`${savedNumber1}${mathOperationCode}${clickedSign}`); // !!!!!!!!!!!!!!!!add new
+    // updateMathOperationOptions(clickedSign);
+    return;
+  }
+  updateMathOperationOptions(clickedSign);
+
+  //   saveFirstNumber();
+
   updateDisplayResult(`${savedNumber1}${mathOperationCode}`); // !!!!!!!!!!!!!!!!add new
 }
 
 function onResultBtnPress() {
-  const value1 = getNumber1();
-  const value2 = getNumber2();
+  //   const value1 = getNumber1();
+  //   const value2 = getNumber2();
+  const value1 = savedNumber1;
+  const value2 = savedNumber2;
   console.log('value1: ', value1);
   console.log('value2 : ', value2);
   console.log('mathOperationCode: ', mathOperationCode);
@@ -107,13 +171,30 @@ function onResultBtnPress() {
     standardOperationsList.includes(mathOperationCode) &&
     mathOperationBtnIsLastPressed
   ) {
-    console.log('використано недопустимий формат');
+    console.log(
+      'недопустимий формат: немає другого числа для проведення розрахунків',
+    );
     showNotification();
-    console.log('after');
     return;
   }
   if (mathOperationCode !== '') {
+    const isRootOnDispay = displayEl.value.includes('√');
+    console.log('isRootonDispay: ', isRootOnDispay);
+    if (isRootOnDispay) {
+      console.log('clikc on = ', mathOperationCode);
+      const number2 = calculateResult(0, value2, '√');
+      console.log('number2: ', number2);
+      const result = calculateResult(value1, number2, mathOperationCode);
+      console.log('result: ', result);
+      updateDisplayResult(result);
+      savedNumber1 = result;
+      savedNumber2 = '';
+      return;
+    }
+
+    console.log('clikc on = ', mathOperationCode);
     const result = calculateResult(value1, value2, mathOperationCode);
+    console.log('result: ', result);
     updateDisplayResult(result);
     savedNumber1 = result;
     savedNumber2 = '';
@@ -136,41 +217,64 @@ function resetDisplayValueIfNeed() {
 }
 
 function accumulateDigitsOnDisplay(digitValue) {
+  console.log('aacamulate function');
   if (displayEl.value === '0') {
-    //if it is only digit-zero on display now
-    updateDisplayResult(digitValue); // we need to delete this digit from display
+    //if it is only digit-zero on display now, we need to delete this digit from display
+    savedNumber1 = digitValue;
+    updateDisplayResult(digitValue);
     return;
   }
 
-  const includesMathSigns = fullOperationsList.some(operation =>
+  console.log('displayEl.value: ', displayEl.value);
+  const isFistNumberNegative = displayEl.value.startsWith('-');
+  const isOperationOnDisplay = fullOperationsList.some(operation =>
     displayEl.value.includes(operation),
   );
+  console.log('isOperationOnDisplay: ', isOperationOnDisplay);
+  console.log('isFistNumberNegative: ', isFistNumberNegative);
 
-  console.log('includesMathSigns: ', includesMathSigns);
-  const result = displayEl.value + digitValue; // we need to accumulate digits on display, every new pressed digit is added in the end of display
-  const isPositiveNumber = result >= 0;
-  let res;
-  if (isPositiveNumber >= 0) {
-    res = handlePositiveNumber(result);
+  let accamulatedValue;
+  if (isOperationOnDisplay) {
+    // savedNumber2 = digitValue;
+    accamulatedValue = savedNumber2 + digitValue;
+    console.log('accamulatedValue : ', accamulatedValue);
+    const isPositiveNumber = accamulatedValue >= 0;
+    let res;
+    if (isPositiveNumber) {
+      res = handlePositiveNumber(accamulatedValue);
+    } else {
+      res = handleNegativeNumber(accamulatedValue);
+    }
+    console.log('res : ', res);
+    savedNumber2 = res;
+    console.log('savedNumber1: ', savedNumber1);
+    console.log(' savedNumber2: ', savedNumber2);
+    updateDisplayResult(`${displayEl.value}${digitValue}`);
   } else {
-    res = handleNegativeNumber(result, matchInNegativeNumber);
+    accamulatedValue = displayEl.value + digitValue;
+    console.log('accamulatedValue : ', accamulatedValue);
+    const isPositiveNumber = accamulatedValue >= 0;
+    console.log('isPositiveNumber: ', isPositiveNumber);
+    let res;
+    if (isPositiveNumber) {
+      res = handlePositiveNumber(accamulatedValue);
+    } else {
+      res = handleNegativeNumber(accamulatedValue);
+    }
+    console.log('res : ', res);
+    savedNumber1 = res;
+    console.log('savedNumber1: ', savedNumber1);
+    console.log(' savedNumber2: ', savedNumber2);
+    updateDisplayResult(`${res}`);
   }
-  console.log('res: ', res);
-  updateDisplayResult(`${res}`);
-  if (includesMathSigns) {
-    savedNumber2 += digitValue;
-  }
-  console.log('savedNumber2: ', savedNumber2);
 }
 
-function saveFirstNumber() {
-  // we need to save the number(set of accumulated digits) which we see on display
-  savedNumber1 = displayEl.value;
-}
+// function saveFirstNumber() {
+//   // we need to save the number(set of accumulated digits) which we see on display
+//   savedNumber1 = displayEl.value;
+// }
 
 function updateMathOperationOptions(mathOperationCodeValue) {
-  console.log('mathOperationCodeValue: ', mathOperationCodeValue);
-  console.log('mathOperationCode: ', mathOperationCode);
   if (mathOperationCode === '^' && mathOperationCodeValue === '-') {
     isNegativePower = true;
   } else {
@@ -194,6 +298,8 @@ function getNumber2() {
 }
 
 function calculateResult(number1, number2, operation) {
+  console.log('typeof number2: ', typeof number2);
+  console.log('typeof number1: ', typeof number1);
   let result;
 
   switch (operation) {
@@ -230,7 +336,7 @@ function roundResult(value) {
 }
 
 function add(number1, number2) {
-  const numbersSum = number1 + number2;
+  const numbersSum = Number(number1) + Number(number2);
   return roundResult(numbersSum);
 }
 
@@ -284,7 +390,7 @@ function squareRoot(number1, number2) {
     const squareRootValue = Math.sqrt(number2);
     return roundResult(multiply(number1, squareRootValue));
   } else {
-    const number = number1 === 0 ? number2 : number1;
+    const number = number1 === 0 || number1 === '' ? number2 : number1;
     const squareRootValue = Math.sqrt(number);
     return roundResult(squareRootValue);
   }
