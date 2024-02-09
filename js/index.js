@@ -65,8 +65,7 @@ function hideNotification() {
 }
 
 function onDelBtnPress() {
-  const isError = displayEl.value === 'ERROR';
-  if (isError) {
+  if (isError()) {
     updateDisplayResult('');
     return;
   }
@@ -83,7 +82,7 @@ function onDecimalBtnPress(e) {
     savedNumber1 && String(savedNumber1).includes('.');
   const isDecimalSeparatorInSecondNumber =
     savedNumber2 && !String(savedNumber2).includes('.');
-  const isSignBefore = fullOperationsList.includes(displayEl.value.slice(-1));
+  const isSignBefore = checkIfMathOperationStarted();
   console.log('isSignBefore: ', isSignBefore);
   if (!isDecimalSeparatorInFirstNumber && !savedNumber2 && !isSignBefore) {
     displayEl.value += el.value;
@@ -112,7 +111,19 @@ function onDecimalBtnPress(e) {
   }
 }
 
+function checkIfMathOperationStarted() {
+  return (isSignBefore = fullOperationsList.includes(
+    displayEl.value.slice(-1),
+  ));
+}
+
+function isError() {
+  return displayEl.value === 'ERROR';
+}
+
 function onSwitchSignBtnPress() {
+  const isSignBefore = checkIfMathOperationStarted();
+  console.log('isSignBefore: ', isSignBefore);
   if (displayEl.value === '0') {
     // displayEl.value = '-';
     // savedNumber1 = '-';
@@ -121,9 +132,11 @@ function onSwitchSignBtnPress() {
     );
     showNotification();
     return;
-  } else {
+  } else if (!isSignBefore) {
     displayEl.value *= -1;
     savedNumber1 *= -1;
+  } else {
+    console.log('тут треба поставити дужки');
   }
 
   console.log('after SIGN SWITCH savedNumber1: ', savedNumber1);
@@ -137,61 +150,35 @@ function onDigitPress(el) {
 function onMathOperationBtnPress(el) {
   const clickedSign = el.value;
   console.log('clickedSign: ', clickedSign);
-  //   if (mathOperationCode === clickedSign) {
-  //     return;
-  //   }
-
-  const isError = displayEl.value === 'ERROR';
-  if (isError) {
+  console.log('mathOperationCode: ', mathOperationCode);
+  if (isError()) {
     updateDisplayResult('');
     return;
   }
-  if (
-    mathOperationCode !== '' &&
-    (clickedSign === '%' || clickedSign === '^')
-  ) {
-    console.log(
-      'недопустимий формат: після знаків математичних операцій на можна ставити % та ^',
-    );
-    showNotification();
+
+  if (isInvalidPercentOrPowerOperation(clickedSign)) {
+    handleInvalidPercentOrPowerOperation();
     return;
   }
 
-  console.log('mathOperationCode: ', mathOperationCode);
-  if (mathOperationCode === '' && clickedSign !== '√' && !savedNumber1) {
-    console.log(
-      'недопустимий формат: не можна проводити додавання, віднімання, множення, ділення, розрахунок відсотка та підняття до степеня, не маючи першого операнда',
-    );
-    showNotification();
+  if (isOperationWithoutFirstOperand(clickedSign)) {
+    handleOperationWithFirstOperand();
     return;
   }
 
-  if (
-    mathOperationCode &&
-    clickedSign === '√' &&
-    mathOperationCode !== clickedSign
-  ) {
-    console.log(
-      'тут треба зробити операцію із першим числом та результатом кореня другого',
-    );
-    console.log('savedNumber1: ', savedNumber1);
-    console.log(' savedNumber2: ', savedNumber2);
-    updateDisplayResult(`${savedNumber1}${mathOperationCode}${clickedSign}`); // !!!!!!!!!!!!!!!!add new
-    // updateMathOperationOptions(clickedSign);
+  if (isSquareRootOperation(clickedSign)) {
+    handleSquareRootOperation(clickedSign);
     return;
   }
   updateMathOperationOptions(clickedSign);
-
-  //   saveFirstNumber();
-
-  updateDisplayResult(`${savedNumber1}${mathOperationCode}`); // !!!!!!!!!!!!!!!!add new
+  updateDisplayResult(`${savedNumber1}${mathOperationCode}`);
 }
 
 function onResultBtnPress() {
   //   const value1 = getNumber1();
   //   const value2 = getNumber2();
-  const value1 = savedNumber1;
-  const value2 = savedNumber2;
+  const value1 = getNumber1();
+  const value2 = getNumber2();
   console.log('value1: ', value1);
   console.log('value2 : ', value2);
   console.log('mathOperationCode: ', mathOperationCode);
@@ -236,9 +223,9 @@ function onResultBtnPress() {
 }
 
 function resetDisplayValueIfNeed() {
-  const isError = displayEl.value === 'ERROR';
-  if (isError) {
+  if (isError()) {
     updateDisplayResult('');
+    return;
   }
   if (mathOperationBtnIsLastPressed) {
     // if the last button on which user have clicked before was math operation button
@@ -316,7 +303,8 @@ function updateMathOperationOptions(mathOperationCodeValue) {
 }
 
 function getNumber1() {
-  return savedNumber1 ? Number(savedNumber1) : 0;
+  //   return savedNumber1 ? Number(savedNumber1) : 0;
+  return savedNumber1;
 }
 
 function getNumber2() {
@@ -432,6 +420,8 @@ function updateDisplayResult(value) {
   displayEl.value = value;
 }
 
+//____________________________DIGITS ACCUMULATION FUNCTIONS ______________________________________//
+
 function handlePositiveNumber(result) {
   const matchInPositiveNumber = result.match(/(\d*)\.(\d*)/); // we need to check whether number on display has decimal separator
 
@@ -499,4 +489,46 @@ function handleNegativeNonWholeNumber(matchInNegativeNumber) {
       : decimalPartString;
 
   return `${signMinusPartString ?? ''}${integerPart}.${decimalPart}`;
+}
+
+// ________________________________________UNIQUE MATH CASES FUNCTIONS ________________//
+function isInvalidPercentOrPowerOperation(clickedSign) {
+  return (
+    mathOperationCode !== '' && (clickedSign === '%' || clickedSign === '^')
+  );
+}
+
+function handleInvalidPercentOrPowerOperation() {
+  console.log(
+    'недопустимий формат: після знаків математичних операцій на можна ставити % та ^',
+  );
+  showNotification();
+}
+
+function isOperationWithoutFirstOperand(clickedSign) {
+  return mathOperationCode === '' && clickedSign !== '√' && !savedNumber1;
+}
+
+function handleOperationWithFirstOperand() {
+  console.log(
+    'недопустимий формат: не можна проводити додавання, віднімання, множення, ділення, розрахунок відсотка та підняття до степеня, не маючи першого операнда',
+  );
+  showNotification();
+}
+
+function isSquareRootOperation(clickedSign) {
+  return (
+    mathOperationCode &&
+    clickedSign === '√' &&
+    mathOperationCode !== clickedSign
+  );
+}
+
+function handleSquareRootOperation(clickedSign) {
+  console.log(
+    'тут треба зробити операцію із першим числом та результатом кореня другого',
+  );
+  console.log('savedNumber1: ', savedNumber1);
+  console.log(' savedNumber2: ', savedNumber2);
+  updateDisplayResult(`${savedNumber1}${mathOperationCode}${clickedSign}`);
 }
