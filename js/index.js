@@ -73,15 +73,29 @@ function onDecimalBtnPress(e) {
   const isDecimalSeparatorInFirstNumber =
     savedNumber1 && String(savedNumber1).includes('.');
   const isDecimalSeparatorInSecondNumber =
-    savedNumber2 && String(savedNumber2).includes('.');
-  if (!isDecimalSeparatorInFirstNumber) {
+    savedNumber2 && !String(savedNumber2).includes('.');
+  const isSignBefore = fullOperationsList.includes(displayEl.value.slice(-1));
+  console.log('isSignBefore: ', isSignBefore);
+  if (!isDecimalSeparatorInFirstNumber && !savedNumber2 && !isSignBefore) {
     displayEl.value += el.value;
     savedNumber1 += el.value;
     console.log('savedNumber1: ', savedNumber1);
     console.log(' savedNumber2: ', savedNumber2);
     return;
   }
-  if (!isDecimalSeparatorInSecondNumber) {
+  if (!savedNumber2 && isSignBefore) {
+    displayEl.value += `0${el.value}`;
+    savedNumber2 = `0${el.value}`;
+    console.log('savedNumber1: ', savedNumber1);
+    console.log(' savedNumber2: ', savedNumber2);
+    return;
+  }
+
+  if (isDecimalSeparatorInSecondNumber) {
+    console.log(
+      'КОЛИ СТАВИМО КРАПКУ В ДРУГОМУ ЧИСЛІsavedNumber2: ',
+      savedNumber2,
+    );
     displayEl.value += el.value;
     savedNumber2 += el.value;
     console.log('savedNumber1: ', savedNumber1);
@@ -91,12 +105,18 @@ function onDecimalBtnPress(e) {
 
 function onSwitchSignBtnPress() {
   if (displayEl.value === '0') {
-    console.log('використано недопустимий формат');
+    // displayEl.value = '-';
+    // savedNumber1 = '-';
+    console.log(
+      'недопустимий формат: спочатку треба ввечти число, а потім вже змінювати його знак',
+    );
     showNotification();
     return;
+  } else {
+    displayEl.value *= -1;
+    savedNumber1 *= -1;
   }
-  displayEl.value *= -1;
-  savedNumber1 *= -1;
+
   console.log('after SIGN SWITCH savedNumber1: ', savedNumber1);
 }
 
@@ -108,9 +128,9 @@ function onDigitPress(el) {
 function onMathOperationBtnPress(el) {
   const clickedSign = el.value;
   console.log('clickedSign: ', clickedSign);
-  if (mathOperationCode === clickedSign) {
-    return;
-  }
+  //   if (mathOperationCode === clickedSign) {
+  //     return;
+  //   }
 
   const isError = displayEl.value === 'ERROR';
   if (isError) {
@@ -118,11 +138,11 @@ function onMathOperationBtnPress(el) {
     return;
   }
   if (
-    (mathOperationCode !== '' && clickedSign === '%') ||
-    clickedSign === '^'
+    mathOperationCode !== '' &&
+    (clickedSign === '%' || clickedSign === '^')
   ) {
     console.log(
-      'недопустимий формат: після знаіків математичних операцій на можна ставити % та ^',
+      'недопустимий формат: після знаків математичних операцій на можна ставити % та ^',
     );
     showNotification();
     return;
@@ -131,7 +151,7 @@ function onMathOperationBtnPress(el) {
   console.log('mathOperationCode: ', mathOperationCode);
   if (mathOperationCode === '' && clickedSign !== '√' && !savedNumber1) {
     console.log(
-      'недопустимий формат: не можна проводити операції не маючи першого операнда',
+      'недопустимий формат: не можна проводити додавання, віднімання, множення, ділення, розрахунок відсотка та підняття до степеня, не маючи першого операнда',
     );
     showNotification();
     return;
@@ -178,7 +198,8 @@ function onResultBtnPress() {
     return;
   }
   if (mathOperationCode !== '') {
-    const isRootOnDispay = displayEl.value.includes('√');
+    const isRootOnDispay =
+      displayEl.value.includes('√') && mathOperationCode !== '√';
     console.log('isRootonDispay: ', isRootOnDispay);
     if (isRootOnDispay) {
       console.log('clikc on = ', mathOperationCode);
