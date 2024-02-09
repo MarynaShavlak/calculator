@@ -48,22 +48,6 @@ function resetCalculator() {
   isNegativePower = false;
 }
 
-function onNotificationClick() {
-  hideNotification();
-  clearTimeout(timeoutID);
-}
-
-function showNotification() {
-  notificationEl.classList.add('isVisible');
-  timeoutID = setTimeout(() => {
-    hideNotification();
-  }, NOTIFICATION_DELAY);
-}
-
-function hideNotification() {
-  notificationEl.classList.remove('isVisible');
-}
-
 function onDelBtnPress() {
   if (isError()) {
     updateDisplayResult('');
@@ -73,49 +57,50 @@ function onDelBtnPress() {
   updateDisplayResult(updatedValue);
 }
 
-function onDecimalBtnPress(e) {
-  console.log('savedNumber1: ', savedNumber1);
-  console.log(' savedNumber2: ', savedNumber2);
-  const el = e.target;
-  //   const isDecimalSeparatorIncludedOnDisplay = displayEl.value.includes('.');
-  const isDecimalSeparatorInFirstNumber =
-    savedNumber1 && String(savedNumber1).includes('.');
-  const isDecimalSeparatorInSecondNumber =
-    savedNumber2 && !String(savedNumber2).includes('.');
-  const isSignBefore = checkIfMathOperationStarted();
-  console.log('isSignBefore: ', isSignBefore);
-  if (!isDecimalSeparatorInFirstNumber && !savedNumber2 && !isSignBefore) {
-    displayEl.value += el.value;
-    savedNumber1 += el.value;
-    console.log('savedNumber1: ', savedNumber1);
-    console.log(' savedNumber2: ', savedNumber2);
+//__________________float numbers functins_________________//
+function onDecimalBtnPress() {
+  if (canAddDotInFirstOperand()) {
+    handleDecimalInFirstOperand();
     return;
-  }
-  if (!savedNumber2 && isSignBefore) {
-    displayEl.value += `0${el.value}`;
-    savedNumber2 = `0${el.value}`;
-    console.log('savedNumber1: ', savedNumber1);
-    console.log(' savedNumber2: ', savedNumber2);
-    return;
-  }
-
-  if (isDecimalSeparatorInSecondNumber) {
-    console.log(
-      'КОЛИ СТАВИМО КРАПКУ В ДРУГОМУ ЧИСЛІsavedNumber2: ',
-      savedNumber2,
-    );
-    displayEl.value += el.value;
-    savedNumber2 += el.value;
-    console.log('savedNumber1: ', savedNumber1);
-    console.log(' savedNumber2: ', savedNumber2);
+  } else if (canCreateFloatSecondOperand()) {
+    handleDecimalClickWithSignBefore();
+  } else if (canAddDotInSecondOperand()) {
+    handleDecimalInSecondOperand();
   }
 }
 
+function canCreateFloatSecondOperand() {
+  const isSignBefore = checkIfMathOperationStarted();
+  return !savedNumber2 && isSignBefore;
+}
+function canAddDotInFirstOperand() {
+  const isDotSeparatorInFirstNumber =
+    savedNumber1 && String(savedNumber1).includes('.');
+  const isSignBefore = checkIfMathOperationStarted();
+  return !isDotSeparatorInFirstNumber && !savedNumber2 && !isSignBefore;
+}
+
+function canAddDotInSecondOperand() {
+  return savedNumber2 && !String(savedNumber2).includes('.');
+}
+
+function handleDecimalInFirstOperand() {
+  displayEl.value += '.';
+  savedNumber1 += '.';
+}
+
+function handleDecimalClickWithSignBefore() {
+  displayEl.value += '0.';
+  savedNumber2 = '0.';
+}
+
+function handleDecimalInSecondOperand() {
+  displayEl.value += '.';
+  savedNumber2 += '.';
+}
+
+//_____________________________________________________________
 function checkIfMathOperationStarted() {
-  //   console.log('LAST SIGN IN TABLO: ', displayEl.value.slice(-1));
-  //   return (isSignBefore = fullOperationsList.includes(
-  //     displayEl.value.slice(-1),
-  //   ));
   let isSignBefore = false;
   const value = displayEl.value;
 
@@ -207,16 +192,9 @@ function onResultBtnPress() {
   resetOperationState();
 }
 
-function handleOperationWithTwoOperands(value1, value2) {
-  if (mathOperationCode !== '') {
-    const isRootOnDispay = checkIfRootOperationStarted();
-    console.log('isRootonDispay: ', isRootOnDispay);
-    if (isRootOnDispay) {
-      handleRootOperation(value1, value2);
-    } else {
-      handleRegularOperation(value1, value2);
-    }
-  }
+function updateDisplayResult(value) {
+  console.log('UPDATE DISPLAY value: ', value);
+  displayEl.value = value;
 }
 
 function resetDisplayValueIfNeed() {
@@ -244,75 +222,34 @@ function accumulateDigitsOnDisplay(digitValue) {
     handleFirstDigitClick(digitValue);
     return;
   }
-  console.log(' IN ACCUMULATE is savedNumber2 : ', savedNumber2);
-
-  const isFistNumberNegative = displayEl.value.startsWith('-');
   const isOperationOnDisplay = checkIfMathOperationStarted();
   console.log('isOperationOnDisplay: ', isOperationOnDisplay);
-  console.log('isFistNumberNegative: ', isFistNumberNegative);
-
-  let accamulatedValue;
   if (isOperationOnDisplay) {
-    accululateWithOperSignOnDisplay(isFistNumberNegative, digitValue);
-    // if (!isFistNumberNegative) {
-    //   // savedNumber2 = digitValue;
-    //   accamulatedValue = savedNumber2 + digitValue;
-    //   console.log('first POSITIVE accamulatedValue : ', accamulatedValue);
-    //   const res = processAccumulatedValue(accamulatedValue);
-    //   console.log('first POSITIVE res : ', res);
-    //   savedNumber2 = res;
-    //   console.log('first POSITIVE savedNumber1: ', savedNumber1);
-    //   console.log(' first POSITIVE savedNumber2: ', savedNumber2);
-    //   updateDisplayResult(`${displayEl.value}${digitValue}`);
-    // } else {
-    //   console.log('перше число негативне');
-    //   accamulatedValue = savedNumber2 + digitValue;
-    //   console.log(
-    //     'накопичений ДРУГИЙ операнд, якщо перший негативний',
-    //     accamulatedValue,
-    //   );
-    //   const res = processAccumulatedValue(accamulatedValue);
-    //   console.log(
-    //     'накопичений ДРУГИЙ операнд, якщо перший негативний ПІСЛЯ ОБРОБКИ: ',
-    //     res,
-    //   );
-    //   savedNumber2 = res;
-    //   //   console.log('savedNumber2: ', savedNumber2);
-    //   updateDisplayResult(`${displayEl.value}${digitValue}`);
-    //   console.log('if first NEGATIVE savedNumber1: ', savedNumber1);
-    //   console.log('if first NEGATIVE savedNumber2: ', savedNumber2);
-    // }
+    accululateWithOperSign(digitValue);
   } else {
-    console.log('displayEl.value: ', displayEl.value);
-    accamulatedValue = displayEl.value + digitValue;
-    console.log('accamulatedValue : ', accamulatedValue);
-    const res = processAccumulatedValue(accamulatedValue);
-    console.log('res : ', res);
-    savedNumber1 = res;
-    console.log('savedNumber1: ', savedNumber1);
-    console.log(' savedNumber2: ', savedNumber2);
-    updateDisplayResult(`${res}`);
+    accululateWithoutOperSign(digitValue);
   }
 }
 
-function accululateWithOperSignOnDisplay(isFistNumberNegative, digitValue) {
-  if (!isFistNumberNegative) {
-    accamulatedValue = savedNumber2 + digitValue;
-    const res = processAccumulatedValue(accamulatedValue);
-    console.log('second operand if first is POSITIVE: ', res);
-    savedNumber2 = res;
-    console.log('first OPERAND: ', savedNumber1);
-    console.log(' second OPERAND: ', savedNumber2);
-    updateDisplayResult(`${displayEl.value}${digitValue}`);
-  } else {
-    accamulatedValue = savedNumber2 + digitValue;
-    const res = processAccumulatedValue(accamulatedValue);
-    console.log('second operand if first is NEGATIVE:', res);
-    savedNumber2 = res;
-    updateDisplayResult(`${displayEl.value}${digitValue}`);
-    console.log('if first NEGATIVE savedNumber1: ', savedNumber1);
-    console.log('if first NEGATIVE savedNumber2: ', savedNumber2);
-  }
+function accululateWithOperSign(digitValue) {
+  accamulatedValue = savedNumber2 + digitValue;
+  const res = processAccumulatedValue(accamulatedValue);
+  console.log('second operand if first is POSITIVE: ', res);
+  savedNumber2 = res;
+
+  updateDisplayResult(`${displayEl.value}${digitValue}`);
+  console.log('first OPERAND: ', savedNumber1);
+  console.log(' second OPERAND: ', savedNumber2);
+}
+
+function accululateWithoutOperSign(digitValue) {
+  accamulatedValue = displayEl.value + digitValue;
+  const res = processAccumulatedValue(accamulatedValue);
+  console.log('accumulated first operand : ', res);
+  savedNumber1 = res;
+  updateDisplayResult(`${res}`);
+  console.log('first OPERAND: ', savedNumber1);
+  console.log('second OPERAND: ', savedNumber2);
 }
 
 function processAccumulatedValue(value) {
@@ -327,11 +264,6 @@ function processAccumulatedValue(value) {
   }
   return result;
 }
-
-// function saveFirstNumber() {
-//   // we need to save the number(set of accumulated digits) which we see on display
-//   savedNumber1 = displayEl.value;
-// }
 
 function updateMathOperationOptions(mathOperationCodeValue) {
   if (mathOperationCode === '^' && mathOperationCodeValue === '-') {
@@ -356,6 +288,8 @@ function getNumber2() {
   }
   return num;
 }
+
+//__________________Mathematical calculation functions_____________________________
 
 function calculateResult(number1, number2, operation) {
   console.log('typeof number2: ', typeof number2);
@@ -454,11 +388,6 @@ function squareRoot(number1, number2) {
     const squareRootValue = Math.sqrt(number);
     return roundResult(squareRootValue);
   }
-}
-
-function updateDisplayResult(value) {
-  console.log('UPDATE DISPLAY value: ', value);
-  displayEl.value = value;
 }
 
 //____________________________DIGITS ACCUMULATION FUNCTIONS ______________________________________//
@@ -625,4 +554,33 @@ function handleRegularOperation(value1, value2) {
 function handleFirstDigitClick(digitValue) {
   savedNumber1 = digitValue;
   updateDisplayResult(digitValue);
+}
+
+function handleOperationWithTwoOperands(value1, value2) {
+  if (mathOperationCode !== '') {
+    const isRootOnDispay = checkIfRootOperationStarted();
+    console.log('isRootonDispay: ', isRootOnDispay);
+    if (isRootOnDispay) {
+      handleRootOperation(value1, value2);
+    } else {
+      handleRegularOperation(value1, value2);
+    }
+  }
+}
+
+//______________Nitification functions ______________________________________
+function onNotificationClick() {
+  hideNotification();
+  clearTimeout(timeoutID);
+}
+
+function showNotification() {
+  notificationEl.classList.add('isVisible');
+  timeoutID = setTimeout(() => {
+    hideNotification();
+  }, NOTIFICATION_DELAY);
+}
+
+function hideNotification() {
+  notificationEl.classList.remove('isVisible');
 }
