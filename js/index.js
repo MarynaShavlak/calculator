@@ -48,39 +48,48 @@ function resetCalculator() {
   isNegativePower = false;
 }
 
+//_____________________Delete button functions________________________//
 function onDelBtnPress() {
   if (isError()) {
-    updateDisplayResult('');
+    clearDisplay();
     return;
   }
-  const updatedValue = displayEl.value.slice(0, -1);
+  const updatedValue = deleteLastCharacter(displayEl.value);
+  const isSecondOperandTotallyDeleted =
+    checkIfMathOperationStarted() && savedNumber2.length < 2;
   console.log('updatedValue: ', updatedValue);
   updateDisplayResult(updatedValue);
 
-  console.log('mathOperationCode: ', mathOperationCode);
-  console.log('savedNumber1: ', savedNumber1);
-  console.log('savedNumber2: ', savedNumber2);
+  console.log('BEFORE DELETION mathOperationCode: ', mathOperationCode);
+  console.log('BEFORE DELETION savedNumber1: ', savedNumber1);
+  console.log('BEFORE DELETION  savedNumber2: ', savedNumber2);
   if (!savedNumber2) {
-    console.log('другого операнда немаэ');
-    savedNumber1 = updatedValue;
-    resetOperationState();
+    deleteFirstOperandCharacter(updatedValue);
+  } else if (isSecondOperandTotallyDeleted) {
+    const sign = getLastCharacter(displayEl.value);
+    updateMathOperationOptions(sign);
+    console.log('sign: ', sign);
+    savedNumber2 = '';
   } else {
     console.log('є другий операнд');
-    const isSignBefore = checkIfMathOperationStarted();
-    console.log('в кінці тільки знак ', isSignBefore);
-    if (isSignBefore && savedNumber2.length < 2) {
-      const sign = displayEl.value.slice(-1);
-      updateMathOperationOptions(sign);
-
-      console.log('sign: ', sign);
-      savedNumber2 = '';
-    } else {
-      savedNumber2 = savedNumber2.slice(0, savedNumber2.length - 1);
-    }
+    savedNumber2 = deleteLastCharacter(savedNumber2);
   }
   console.log('AFTER DELETION savedNumber1: ', savedNumber1);
   console.log('AFTER DELETION savedNumber2: ', savedNumber2);
   console.log('AFTER DELETION mathOperationCode: ', mathOperationCode);
+}
+
+function deleteFirstOperandCharacter(updatedValue) {
+  savedNumber1 = updatedValue;
+  resetOperationState();
+}
+
+function deleteLastCharacter(str) {
+  return str.slice(0, -1);
+}
+
+function getLastCharacter(str) {
+  return str.slice(-1);
 }
 
 //__________________float numbers functins_________________//
@@ -130,7 +139,9 @@ function checkIfMathOperationStarted() {
   let isSignBefore = false;
   const value = displayEl.value;
   console.log('value: ', value);
-
+  if (value === '√') {
+    return true;
+  }
   for (let i = 1; i < value.length; i++) {
     if (fullOperationsList.includes(value[i])) {
       isSignBefore = true;
@@ -179,7 +190,7 @@ function onMathOperationBtnPress(el) {
   console.log('clickedSign: ', clickedSign);
   console.log('mathOperationCode: ', mathOperationCode);
   if (isError()) {
-    updateDisplayResult('');
+    clearDisplay();
     return;
   }
 
@@ -195,6 +206,7 @@ function onMathOperationBtnPress(el) {
 
   if (isSquareRootOperation(clickedSign)) {
     handleSquareRootDisplay(clickedSign);
+    updateMathOperationOptions(clickedSign);
     return;
   }
   updateMathOperationOptions(clickedSign);
@@ -209,8 +221,10 @@ function onResultBtnPress() {
   console.log('mathOperationCode: ', mathOperationCode);
   console.log('mathOperationBtnIsLastPressed: ', mathOperationBtnIsLastPressed);
   if (isOperationWithoutSecondOperand()) {
+    console.log('one operand');
     handleOperationWithoutSecondOperand();
   } else {
+    console.log('two operands');
     handleOperationWithTwoOperands(value1, value2);
   }
 
@@ -226,7 +240,7 @@ function updateDisplayResult(value) {
 
 function resetDisplayValueIfNeed() {
   if (isError()) {
-    updateDisplayResult('');
+    clearDisplay();
     return;
   }
   if (mathOperationBtnIsLastPressed) {
@@ -236,6 +250,10 @@ function resetDisplayValueIfNeed() {
     mathOperationBtnIsLastPressed = false;
     // now math operation button is not the last  pressed button anymore, so we need to reset variable flag to origin state
   }
+}
+
+function clearDisplay() {
+  updateDisplayResult('');
 }
 
 function resetOperationState() {
@@ -250,7 +268,7 @@ function accumulateDigitsOnDisplay(digitValue) {
     return;
   }
   const isOperationOnDisplay = checkIfMathOperationStarted();
-  console.log('isOperationOnDisplay: ', isOperationOnDisplay);
+  console.log('in ACC func isOperationOnDisplay: ', isOperationOnDisplay);
   if (isOperationOnDisplay) {
     accululateWithOperSign(digitValue);
   } else {
@@ -265,8 +283,8 @@ function accululateWithOperSign(digitValue) {
   savedNumber2 = res;
 
   updateDisplayResult(`${displayEl.value}${digitValue}`);
-  console.log('first OPERAND: ', savedNumber1);
-  console.log(' second OPERAND: ', savedNumber2);
+  console.log('in ACC funcfirst OPERAND: ', savedNumber1);
+  console.log('in ACC func second OPERAND: ', savedNumber2);
 }
 
 function accululateWithoutOperSign(digitValue) {
@@ -275,14 +293,12 @@ function accululateWithoutOperSign(digitValue) {
   console.log('accumulated first operand : ', res);
   savedNumber1 = res;
   updateDisplayResult(`${res}`);
-  console.log('first OPERAND: ', savedNumber1);
-  console.log('second OPERAND: ', savedNumber2);
+  console.log('in ACC func first OPERAND: ', savedNumber1);
+  console.log('in ACC func second OPERAND: ', savedNumber2);
 }
 
 function processAccumulatedValue(value) {
-  console.log('accamulatedValue : ', value);
   const isPositiveNumber = value >= 0;
-  console.log('isPositiveNumber: ', isPositiveNumber);
   let result;
   if (isPositiveNumber) {
     result = handlePositiveNumber(value);
@@ -308,7 +324,7 @@ function getNumber1() {
 
 function getNumber2() {
   let num;
-  if (mathOperationCode === '%') {
+  if (mathOperationCode === '%' && !savedNumber2) {
     num = 1;
   } else {
     num = Number(savedNumber2);
@@ -514,6 +530,14 @@ function handleOperationWithoutFirstOperand() {
 }
 
 function isOperationWithoutSecondOperand() {
+  console.log(
+    '!!!in isOperationWithoutSecondOperand mathOperationCode: ',
+    mathOperationCode,
+  );
+  console.log(
+    '!!!in isOperationWithoutSecondOperand mathOperationBtnIsLastPressed: ',
+    mathOperationBtnIsLastPressed,
+  );
   return (
     standardOperationsList.includes(mathOperationCode) &&
     mathOperationBtnIsLastPressed
