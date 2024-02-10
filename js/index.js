@@ -682,9 +682,18 @@ function handleRootOperation(value1, value2) {
     'when click on "=" and IS ROOT, the sign of operation is',
     mathOperationCode,
   );
-  const number2 = calculateResult(0, value2, '√');
-  console.log('IT IS SQUARE ROOT: ', number2);
-  const result = calculateResult(value1, number2, mathOperationCode);
+  let result;
+  const isRootFirstonDisplay = isRootTheFirstOnDisplay();
+  if (isRootFirstonDisplay) {
+    console.log('БЕРЕМО КОРІНЬ ПЕРШОГО ЧИСЛА');
+    const number1 = calculateResult(0, value1, '√');
+    console.log('IT IS calculated SQUARE ROOT: ', number1);
+    result = calculateResult(value2, number1, mathOperationCode);
+  } else {
+    const number2 = calculateResult(0, value2, '√');
+    console.log('IT IS calculated SQUARE ROOT: ', number2);
+    result = calculateResult(value1, number2, mathOperationCode);
+  }
   console.log(
     'when click on "=" and IS ROOT, the result of operation is ',
     result,
