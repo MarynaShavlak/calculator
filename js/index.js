@@ -137,18 +137,20 @@ function handleDecimalInSecondOperand() {
 //_____________________________________________________________
 function checkIfMathOperationStarted() {
   let isSignBefore = false;
-  const value = displayEl.value;
-  console.log('value: ', value);
-  if (value === '√') {
+  const firstDisplayElement = displayEl.value.slice(0, 1);
+  console.log('firstDisplayElemente: ', firstDisplayElement);
+  if (firstDisplayElement === '√') {
     return true;
-  }
-  for (let i = 1; i < value.length; i++) {
-    if (fullOperationsList.includes(value[i])) {
-      isSignBefore = true;
-      break;
+  } else if (firstDisplayElement !== '√') {
+    const value = displayEl.value;
+    for (let i = 1; i < value.length; i++) {
+      if (fullOperationsList.includes(value[i])) {
+        isSignBefore = true;
+        break;
+      }
     }
+    return isSignBefore;
   }
-  return isSignBefore;
 }
 
 function checkIfRootOperationStarted() {
@@ -166,7 +168,8 @@ function onSwitchSignBtnPress() {
     // displayEl.value = '-';
     // savedNumber1 = '-';
     console.log(
-      'недопустимий формат: спочатку треба ввечти число, а потім вже змінювати його знак',
+      '%cнедопустимий формат: спочатку треба ввечти число, а потім вже змінювати його знак',
+      'color:red',
     );
     showNotification();
     return;
@@ -187,8 +190,16 @@ function onDigitPress(el) {
 
 function onMathOperationBtnPress(el) {
   const clickedSign = el.value;
-  console.log('clickedSign: ', clickedSign);
-  console.log('mathOperationCode: ', mathOperationCode);
+  console.log(
+    `%cякий знак був записаний перед кліком на інший знак?:  ${mathOperationCode}`,
+
+    'background-color: yellow',
+  );
+  console.log(
+    `%cна який знак клікнула?: ${clickedSign}`,
+
+    'background-color: yellow',
+  );
   if (isError()) {
     clearDisplay();
     return;
@@ -196,21 +207,38 @@ function onMathOperationBtnPress(el) {
 
   if (isInvalidPercentOrPowerOperation(clickedSign)) {
     handleInvalidPercentOrPowerOperation();
+    console.log(
+      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
+      'font-size: larger; font-weight: 900; background-color: yellow',
+    );
     return;
   }
 
   if (isOperationWithoutFirstOperand(clickedSign)) {
     handleOperationWithoutFirstOperand();
+    console.log(
+      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
+      'font-size: larger; font-weight: 900; background-color: yellow',
+    );
     return;
   }
-
+  const isRoot = isSquareRootOperation(clickedSign);
+  console.log('isRoot: ', isRoot);
   if (isSquareRootOperation(clickedSign)) {
     handleSquareRootDisplay(clickedSign);
     updateMathOperationOptions(clickedSign);
+    console.log(
+      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
+      'font-size: larger; font-weight: 900; background-color: yellow',
+    );
     return;
   }
   updateMathOperationOptions(clickedSign);
   updateDisplayResult(`${savedNumber1}${mathOperationCode}`);
+  console.log(
+    `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
+    'font-size: larger; font-weight: 900; background-color: yellow',
+  );
 }
 
 function onResultBtnPress() {
@@ -219,17 +247,16 @@ function onResultBtnPress() {
   console.log('value1: ', value1);
   console.log('value2 : ', value2);
   console.log('mathOperationCode: ', mathOperationCode);
-  console.log('mathOperationBtnIsLastPressed: ', mathOperationBtnIsLastPressed);
   if (isOperationWithoutSecondOperand()) {
-    console.log('one operand');
+    console.log('коли тисне а "=", то Є 1 operand');
     handleOperationWithoutSecondOperand();
   } else {
-    console.log('two operands');
+    console.log('коли тисне а "=", то Є 2 operands');
     handleOperationWithTwoOperands(value1, value2);
   }
 
-  console.log('on =  click savedNumber1: ', savedNumber1);
-  console.log(' on = clikc savedNumber2: ', savedNumber2);
+  console.log('після настискання на  =  savedNumber1: ', savedNumber1);
+  console.log(' після настискання на   = savedNumber2: ', savedNumber2);
   resetOperationState();
 }
 
@@ -262,13 +289,11 @@ function resetOperationState() {
 }
 
 function accumulateDigitsOnDisplay(digitValue) {
-  console.log('START ACCUMULATE');
   if (displayEl.value === '0') {
     handleFirstDigitClick(digitValue);
     return;
   }
   const isOperationOnDisplay = checkIfMathOperationStarted();
-  console.log('in ACC func isOperationOnDisplay: ', isOperationOnDisplay);
   if (isOperationOnDisplay) {
     accululateWithOperSign(digitValue);
   } else {
@@ -279,22 +304,16 @@ function accumulateDigitsOnDisplay(digitValue) {
 function accululateWithOperSign(digitValue) {
   accamulatedValue = savedNumber2 + digitValue;
   const res = processAccumulatedValue(accamulatedValue);
-  console.log('second operand if first is POSITIVE: ', res);
   savedNumber2 = res;
 
   updateDisplayResult(`${displayEl.value}${digitValue}`);
-  console.log('in ACC funcfirst OPERAND: ', savedNumber1);
-  console.log('in ACC func second OPERAND: ', savedNumber2);
 }
 
 function accululateWithoutOperSign(digitValue) {
   accamulatedValue = displayEl.value + digitValue;
   const res = processAccumulatedValue(accamulatedValue);
-  console.log('accumulated first operand : ', res);
   savedNumber1 = res;
   updateDisplayResult(`${res}`);
-  console.log('in ACC func first OPERAND: ', savedNumber1);
-  console.log('in ACC func second OPERAND: ', savedNumber2);
 }
 
 function processAccumulatedValue(value) {
@@ -308,13 +327,35 @@ function processAccumulatedValue(value) {
   return result;
 }
 
-function updateMathOperationOptions(mathOperationCodeValue) {
-  if (mathOperationCode === '^' && mathOperationCodeValue === '-') {
+function updateMathOperationOptions(clickedSign) {
+  console.log(
+    `%cclickedSign ПЕРЕД ОБНОВЛЕННЯМ :${clickedSign} `,
+
+    'background-color: orange',
+  );
+  console.log(
+    `%cmathOperationCode ПЕРЕД ОБНОВЛЕННЯМ: ${mathOperationCode}`,
+
+    'background-color: orange',
+  );
+  if (mathOperationCode === '^' && clickedSign === '-') {
     isNegativePower = true;
+  } else if (
+    mathOperationCode !== '' &&
+    clickedSign === '√' &&
+    mathOperationCode !== clickedSign
+  ) {
+    mathOperationBtnIsLastPressed = true;
   } else {
     mathOperationBtnIsLastPressed = true;
-    mathOperationCode = mathOperationCodeValue;
+    mathOperationCode = clickedSign;
   }
+
+  console.log(
+    `'%cmathOperationCode ПІСЛЯ ОБНОВЛЕННЯ: ${mathOperationCode}`,
+
+    'background-color: orange; font-weight: 900',
+  );
 }
 
 function getNumber1() {
@@ -335,8 +376,6 @@ function getNumber2() {
 //__________________Mathematical calculation functions_____________________________
 
 function calculateResult(number1, number2, operation) {
-  console.log('typeof number2: ', typeof number2);
-  console.log('typeof number1: ', typeof number1);
   let result;
 
   switch (operation) {
@@ -513,7 +552,8 @@ function isInvalidPercentOrPowerOperation(clickedSign) {
 
 function handleInvalidPercentOrPowerOperation() {
   console.log(
-    'недопустимий формат: після знаків математичних операцій на можна ставити % та ^',
+    '%cнедопустимий формат: після знаків математичних операцій на можна ставити % та ^',
+    'color:red',
   );
   showNotification();
 }
@@ -524,20 +564,13 @@ function isOperationWithoutFirstOperand(clickedSign) {
 
 function handleOperationWithoutFirstOperand() {
   console.log(
-    'недопустимий формат: не можна проводити додавання, віднімання, множення, ділення, розрахунок відсотка та підняття до степеня, не маючи першого операнда',
+    '%cнедопустимий формат: не можна проводити додавання, віднімання, множення, ділення, розрахунок відсотка та підняття до степеня, не маючи першого операнда',
+    'color:red',
   );
   showNotification();
 }
 
 function isOperationWithoutSecondOperand() {
-  console.log(
-    '!!!in isOperationWithoutSecondOperand mathOperationCode: ',
-    mathOperationCode,
-  );
-  console.log(
-    '!!!in isOperationWithoutSecondOperand mathOperationBtnIsLastPressed: ',
-    mathOperationBtnIsLastPressed,
-  );
   return (
     standardOperationsList.includes(mathOperationCode) &&
     mathOperationBtnIsLastPressed
@@ -546,12 +579,15 @@ function isOperationWithoutSecondOperand() {
 
 function handleOperationWithoutSecondOperand() {
   console.log(
-    'недопустимий формат: немає другого числа для проведення розрахунків',
+    '%cнедопустимий формат: немає другого числа для проведення розрахунків',
+    'color:red',
   );
   showNotification();
 }
 
 function isSquareRootOperation(clickedSign) {
+  console.log('iS ROOT clickedSign: ', clickedSign);
+  console.log('IS ROOT mathOperationCode: ', mathOperationCode);
   return (
     mathOperationCode &&
     clickedSign === '√' &&
@@ -608,9 +644,10 @@ function handleFirstDigitClick(digitValue) {
 }
 
 function handleOperationWithTwoOperands(value1, value2) {
+  console.log('Знак коли тисну "=": ', mathOperationCode);
   if (mathOperationCode !== '') {
     const isRootOnDispay = checkIfRootOperationStarted();
-    console.log('isRootonDispay: ', isRootOnDispay);
+    console.log('є корінь коли тисну "="? ', isRootOnDispay);
     if (isRootOnDispay) {
       handleRootOperation(value1, value2);
     } else {
