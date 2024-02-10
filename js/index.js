@@ -91,6 +91,9 @@ function deleteLastCharacter(str) {
 function getLastCharacter(str) {
   return str.slice(-1);
 }
+function getFirstCharacter(str) {
+  return str.slice(0, 1);
+}
 
 //__________________float numbers functins_________________//
 function onDecimalBtnPress() {
@@ -151,6 +154,18 @@ function checkIfMathOperationStarted() {
     }
     return isSignBefore;
   }
+}
+
+function checkIfNotRootOperationStarted() {
+  let isSignBefore = false;
+  const value = displayEl.value;
+  for (let i = 1; i < value.length; i++) {
+    if (fullOperationsList.includes(value[i])) {
+      isSignBefore = true;
+      break;
+    }
+  }
+  return isSignBefore;
 }
 
 function checkIfRootOperationStarted() {
@@ -222,6 +237,20 @@ function onMathOperationBtnPress(el) {
     );
     return;
   }
+
+  const isRootFirstOnDisplay = isRootTheFirstOnDisplay(clickedSign);
+  console.log('isRootFirstOnDisplay: ', isRootFirstOnDisplay);
+
+  if (isRootTheFirstOnDisplay(clickedSign)) {
+    console.log('це значить шо корінь на екрані йде перший');
+    handleDisplayIfRootIsFirst(clickedSign);
+    updateMathOperationOptions(clickedSign);
+    console.log(
+      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
+      'font-size: larger; font-weight: 900; background-color: yellow',
+    );
+    return;
+  }
   const isRoot = isSquareRootOperation(clickedSign);
   console.log('isRoot: ', isRoot);
   if (isSquareRootOperation(clickedSign)) {
@@ -261,7 +290,10 @@ function onResultBtnPress() {
 }
 
 function updateDisplayResult(value) {
-  console.log('UPDATE DISPLAY value: ', value);
+  console.log(
+    `%c Це треба показати на дісплеї', ${value}`,
+    'color:white; background-color: green; font-weight:700',
+  );
   displayEl.value = value;
 }
 
@@ -294,26 +326,57 @@ function accumulateDigitsOnDisplay(digitValue) {
     return;
   }
   const isOperationOnDisplay = checkIfMathOperationStarted();
+  console.log('ON DIGIT CLICK: isOperationOnDisplay: ', isOperationOnDisplay);
+  const isRootFirstonDisplay = isRootTheFirstOnDisplay();
+  const hasNotFirstRootSignOnDisplay = checkIfNotRootOperationStarted();
+  console.log('ON DIGIT CLICK: isRootFirstonDisplay: ', isRootFirstonDisplay);
+  console.log('hasNotFirstRootSognOnDisplay : ', hasNotFirstRootSignOnDisplay);
   if (isOperationOnDisplay) {
-    accululateWithOperSign(digitValue);
+    if (isRootFirstonDisplay && !hasNotFirstRootSignOnDisplay) {
+      accululateWithoutOperSign(digitValue);
+    } else {
+      accululateWithOperSign(digitValue);
+    }
   } else {
     accululateWithoutOperSign(digitValue);
   }
 }
 
 function accululateWithOperSign(digitValue) {
+  console.log('АКАМУЛЮЭМО ЦИФРЫ В ЧИСЛО НОМЕР 2 ');
   accamulatedValue = savedNumber2 + digitValue;
   const res = processAccumulatedValue(accamulatedValue);
   savedNumber2 = res;
-
+  console.log('АКАМУЛЮЭМО ЦИФРЫ savedNumber1: ', savedNumber1);
+  console.log(' АКАМУЛЮЭМО ЦИФРЫ savedNumber2: ', savedNumber2);
   updateDisplayResult(`${displayEl.value}${digitValue}`);
 }
 
 function accululateWithoutOperSign(digitValue) {
-  accamulatedValue = displayEl.value + digitValue;
-  const res = processAccumulatedValue(accamulatedValue);
-  savedNumber1 = res;
-  updateDisplayResult(`${res}`);
+  console.log('АКАМУЛЮЭМО ЦИФРЫ В ЧИСЛО НОМЕР 1 ');
+  const isRootFirstonDisplay = isRootTheFirstOnDisplay();
+  console.log('isRootFirstonDisplay: ', isRootFirstonDisplay);
+  let accamulatedValue;
+  let res;
+  console.log('mathOperationBtnIsLastPressed: ', mathOperationBtnIsLastPressed);
+  if (isRootFirstonDisplay) {
+    // accamulatedValue = displayEl.value.slice(1) + digitValue;
+    console.log('HERE!!!!!!!!!!!!');
+    accamulatedValue = savedNumber1 + digitValue;
+    res = processAccumulatedValue(accamulatedValue);
+    savedNumber1 = res;
+    updateDisplayResult(`${getFirstCharacter(displayEl.value)}${res}`);
+  } else {
+    accamulatedValue = displayEl.value + digitValue;
+    res = processAccumulatedValue(accamulatedValue);
+    savedNumber1 = res;
+    updateDisplayResult(`${res}`);
+  }
+  //   const res = processAccumulatedValue(accamulatedValue);
+  //   savedNumber1 = res;
+  console.log('АКАМУЛЮЭМО ЦИФРЫ savedNumber1: ', savedNumber1);
+  console.log('АКАМУЛЮЭМО ЦИФРЫ  savedNumber2: ', savedNumber2);
+  //   updateDisplayResult(`${res}`);
 }
 
 function processAccumulatedValue(value) {
@@ -364,6 +427,7 @@ function getNumber1() {
 }
 
 function getNumber2() {
+  console.log('in getNumber2 savedNumber2: ', savedNumber2);
   let num;
   if (mathOperationCode === '%' && !savedNumber2) {
     num = 1;
@@ -586,13 +650,20 @@ function handleOperationWithoutSecondOperand() {
 }
 
 function isSquareRootOperation(clickedSign) {
-  console.log('iS ROOT clickedSign: ', clickedSign);
-  console.log('IS ROOT mathOperationCode: ', mathOperationCode);
+  console.log('iS ROOT present on: clickedSign: ', clickedSign);
+  console.log('IS ROOT preset on: mathOperationCode: ', mathOperationCode);
   return (
     mathOperationCode &&
     clickedSign === '√' &&
     mathOperationCode !== clickedSign
   );
+}
+
+function isRootTheFirstOnDisplay(clickedSign) {
+  console.log('iS ROOT FIRST on: clickedSign: ', clickedSign);
+  console.log('iS ROOT FIRST  on: mathOperationCode: ', mathOperationCode);
+  return getFirstCharacter(displayEl.value) === '√';
+  //   return mathOperationCode === '' && clickedSign === '√';
 }
 
 function handleSquareRootDisplay(clickedSign) {
@@ -605,6 +676,8 @@ function handleSquareRootDisplay(clickedSign) {
 }
 
 function handleRootOperation(value1, value2) {
+  console.log('in handleRootOperation value1: ', value1);
+  console.log('in handleRootOperation value2: ', value2);
   console.log(
     'when click on "=" and IS ROOT, the sign of operation is',
     mathOperationCode,
@@ -619,6 +692,15 @@ function handleRootOperation(value1, value2) {
   updateDisplayResult(result);
   savedNumber1 = result;
   savedNumber2 = '';
+}
+
+function handleDisplayIfRootIsFirst(clickedSign) {
+  console.log(
+    'тут треба зробити операцію із результатом кореня першого числа та другим числом',
+  );
+  console.log('if √ - FIRST  savedNumber1: ', savedNumber1);
+  console.log(' if √ - FIRST savedNumber2: ', savedNumber2);
+  updateDisplayResult(`${displayEl.value}${clickedSign}`);
 }
 
 function handleRegularOperation(value1, value2) {
