@@ -11,10 +11,14 @@ body {
   background-size: cover;
   overflow: hidden;
 }
+button,
+input {
+  font-family: 'Exo 2', sans-serif;
+}
 
 .container {
   display: grid;
-  user-select: none;
+  /* user-select: none; */
   margin-left: auto;
   margin-right: auto;
 
@@ -100,15 +104,25 @@ body {
   box-shadow: 0 14px 28px rgb(0, 2, 0, 0.75);
 }
 .calc-screen {
+  display: grid;
+  grid-template-rows: 1fr;
+  padding: 10px;
+  position: relative;
   border: 3px solid #021a48;
   border-radius: 20px;
   background: #9ce9f6;
   color: #021a48;
 }
-.calc-screen {
-  display: grid;
-  grid-template-rows: 1fr;
-  padding: 10px;
+.copy-icon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 40px;
+  cursor: pointer;
+  transition: color 300ms cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+.copy-icon:hover {
+  color: #ffaf01;
 }
 .calc-display {
   text-align: right;

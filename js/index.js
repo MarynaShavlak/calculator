@@ -8,6 +8,7 @@ const clearAllBtn = document.querySelector('#clearAll-btn');
 const deleteBtn = document.querySelector('#delete-btn');
 const decimalBtn = document.querySelector('#decimal-btn');
 const switchSignBtn = document.querySelector('#switch-sign-btn');
+const copyIcon = document.querySelector('.copy-icon');
 const MAX_INT_DIGITS_POS = 15; // integer part of positive number can include no more than 15 digits;
 const MAX_INT_DIGITS_NEG = 16; // integer part of negative number can include no more than 16 elements(15 digits and sign minus);
 const MAX_DECIMAL_DIGITS = 6; // decimal part of number can include no more than 6 digits;
@@ -25,6 +26,7 @@ clearAllBtn.addEventListener('click', resetCalculator);
 deleteBtn.addEventListener('click', onDelBtnPress);
 decimalBtn.addEventListener('click', onDecimalBtnPress);
 switchSignBtn.addEventListener('click', onSwitchSignBtnPress);
+copyIcon.addEventListener('click', copyDisplayValueToClipboard);
 
 buttonsTablo.addEventListener('click', function (e) {
   const clickedEl = e.target;
@@ -193,9 +195,14 @@ function onSwitchSignBtnPress() {
     savedNumber1 *= -1;
   } else {
     console.log('тут треба поставити дужки');
+    savedNumber2 = '-';
+    const updatedDisplayValue = displayEl.value + '(-';
+    console.log('updatedDisplayValue : ', updatedDisplayValue);
+    updateDisplayResult(updatedDisplayValue);
   }
 
   console.log('after SIGN SWITCH savedNumber1: ', savedNumber1);
+  console.log('after SIGN SWITCH savedNumber2: ', savedNumber2);
 }
 
 function onDigitPress(el) {
@@ -500,12 +507,14 @@ function divide(number1, number2) {
 }
 
 function calculatePercentage(number1, number2) {
-  if (number1 < 0) {
-    return 'ERROR';
-  } else {
-    const percentage = (number1 * number2) / 100;
-    return roundResult(percentage);
-  }
+  const percentage = (number1 * number2) / 100;
+  return roundResult(percentage);
+  //   if (number1 < 0) {
+  //     return 'ERROR';
+  //   } else {
+  //     const percentage = (number1 * number2) / 100;
+  //     return roundResult(percentage);
+  //   }
 }
 
 function power(number1, number2) {
@@ -762,4 +771,16 @@ function showNotification() {
 
 function hideNotification() {
   notificationEl.classList.remove('isVisible');
+}
+
+// ______Copy value to clipboard from display ______//
+
+function copyDisplayValueToClipboard() {
+  const text = displayEl.value;
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textArea);
 }

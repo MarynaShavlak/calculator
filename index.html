@@ -5,11 +5,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CalculatorUA</title>
-    <link rel="stylesheet" href="css/index.css" />
-    <script
-      src="https://kit.fontawesome.com/719ad72ce7.js"
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
       crossorigin="anonymous"
-    ></script>
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="css/index.css" />
   </head>
 
   <body>
@@ -17,11 +26,11 @@
       <div class="container">
         <div class="calculator">
           <div class="calc-screen">
+            <i class="fa-regular fa-copy copy-icon"></i>
             <input
               type="text"
               class="calc-display"
               id="main-calc-display"
-              placeholder="0"
               value="0"
               readonly="readonly"
             />
