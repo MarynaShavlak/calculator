@@ -1,69 +1,129 @@
 <!DOCTYPE html>
-<html lang='en'>
-
-<head>
-    <meta charset='UTF-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CalculatorUA</title>
-    <link rel='stylesheet' href='css/index.css'>
-    <script src='https://kit.fontawesome.com/719ad72ce7.js' crossorigin='anonymous'></script>
-</head>
+    <link rel="stylesheet" href="css/index.css" />
+    <script
+      src="https://kit.fontawesome.com/719ad72ce7.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
 
-<body>
-    <div class='container'>
-        <div class='calculator'>
-            <div class='calc-screen'>
-                <input type='text' class='calc-display' id='main-calc-display' placeholder='0' value='0'
-                    readonly='readonly'>
-            </div>
-            <div class='buttons-tablo'>
-                <button class='btn additional-operation-btn clearAll-btn' id='clearAll-btn'>AC</button>
-                <button class='btn additional-operation-btn delete-btn' id='delete-btn'><i
-                        class='fa-solid fa-delete-left'></i></button>
-                <button class='btn math-operation-btn main-operation-btn devide-btn' value='/'>&divide;</button>
-                <button class='btn math-operation-btn main-operation-btn multiply-btn' value='*'>X</button>
-                <button class='btn math-operation-btn main-operation-btn plus-btn' value='+'>+</button>
-                <button class='btn math-operation-btn main-operation-btn minus-btn' value='-'>-</button>
-                <button class='btn math-operation-btn additional-operation-btn percent-btn' value='%'>%</button>
-                <button class='btn math-operation-btn additional-operation-btn square-root-btn'
-                    value='√'>&radic;</button>
-                <button class='btn digit-btn btn-7' value='7'>7</button>
-                <button class='btn digit-btn btn-8' value='8'>8</button>
-                <button class='btn digit-btn btn-9' value='9'>9</button>
-                <button class='btn main-operation-btn result-operation-btn' id='result-btn'>=</button>
-                <button class='btn math-operation-btn additional-operation-btn power-btn' value='^'>^</button>
-                <button class='btn additional-operation-btn switch-sign-btn' id='switch-sign-btn'>+/-</button>
-                <button class='btn digit-btn btn-4' value='4'>4</button>
-                <button class='btn digit-btn btn-5' value='5'>5</button>
-                <button class='btn digit-btn btn-6' value='6'>6</button>
-                <button class='btn digit-btn btn-0' value='0'>0</button>
-                <button class='btn digit-btn btn-1' value='1'>1</button>
-                <button class='btn digit-btn btn-2' value='2'>2</button>
-                <button class='btn digit-btn btn-3' value='3'>3</button>
-                <button class='btn main-operation-btn decimal-btn' id='decimal-btn' value='.'>.</button>
-            </div>
+  <body>
+    <section class="calculator--section">
+      <div class="container">
+        <div class="calculator">
+          <div class="calc-screen">
+            <input
+              type="text"
+              class="calc-display"
+              id="main-calc-display"
+              placeholder="0"
+              value="0"
+              readonly="readonly"
+            />
+          </div>
+          <div class="buttons-tablo">
+            <button
+              class="btn additional-operation-btn clearAll-btn"
+              id="clearAll-btn"
+            >
+              AC
+            </button>
+            <button
+              class="btn additional-operation-btn delete-btn"
+              id="delete-btn"
+            >
+              <i class="fa-solid fa-delete-left"></i>
+            </button>
+            <button
+              class="btn math-operation-btn main-operation-btn devide-btn"
+              value="/"
+            >
+              &divide;
+            </button>
+            <button
+              class="btn math-operation-btn main-operation-btn multiply-btn"
+              value="*"
+            >
+              X
+            </button>
+            <button
+              class="btn math-operation-btn main-operation-btn plus-btn"
+              value="+"
+            >
+              +
+            </button>
+            <button
+              class="btn math-operation-btn main-operation-btn minus-btn"
+              value="-"
+            >
+              -
+            </button>
+            <button
+              class="btn math-operation-btn additional-operation-btn percent-btn"
+              value="%"
+            >
+              %
+            </button>
+            <button
+              class="btn math-operation-btn additional-operation-btn square-root-btn"
+              value="√"
+            >
+              &radic;
+            </button>
+            <button class="btn digit-btn btn-7" value="7">7</button>
+            <button class="btn digit-btn btn-8" value="8">8</button>
+            <button class="btn digit-btn btn-9" value="9">9</button>
+            <button
+              class="btn main-operation-btn result-operation-btn"
+              id="result-btn"
+            >
+              =
+            </button>
+            <button
+              class="btn math-operation-btn additional-operation-btn power-btn"
+              value="^"
+            >
+              ^
+            </button>
+            <button
+              class="btn additional-operation-btn switch-sign-btn"
+              id="switch-sign-btn"
+            >
+              +/-
+            </button>
+            <button class="btn digit-btn btn-4" value="4">4</button>
+            <button class="btn digit-btn btn-5" value="5">5</button>
+            <button class="btn digit-btn btn-6" value="6">6</button>
+            <button class="btn digit-btn btn-0" value="0">0</button>
+            <button class="btn digit-btn btn-1" value="1">1</button>
+            <button class="btn digit-btn btn-2" value="2">2</button>
+            <button class="btn digit-btn btn-3" value="3">3</button>
+            <button
+              class="btn main-operation-btn decimal-btn"
+              id="decimal-btn"
+              value="."
+            >
+              .
+            </button>
+          </div>
         </div>
-        <div class="authors">
-            <p>Illustrations by:</p>
-            <p>
-            <ul>
-                <li>@revera.anna</li>
-                <li>@natashalee777</li>
-                <li>@borisgroh</li>
-                <li>@kateryna.cherniavska</li>
-                <li>@bright_arts</li>
-            </ul>
-            </p>
 
+        <div class="error-notification-modal" role="dialog">
+          <img
+            class="error-notification-img"
+            src="./images/patron.png"
+            alt="photo of dog Patron"
+          />
+          <p class="error-notification-text">Invalid operation format</p>
         </div>
-         <div class="error-notification-modal" role="dialog"> 
-            <img class="error-notification-img" src="./images/patron.png" alt="photo of dog Patron"/>
-            <p class="error-notification-text">Invalid operation format</p>
-        </div>
-    </div>
-    <script src='js/index.js'></script>
-</body>
+      </div>
+    </section>
 
-
+    <script src="js/index.js"></script>
+  </body>
 </html>

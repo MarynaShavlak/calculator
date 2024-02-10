@@ -6,3 +6,9 @@ The Calculator project is a front-end web-based application that provides users 
 ## Demo
 https://github.com/MarynaShavlak/calculator/assets/111526360/22d33e89-94a9-4c02-8af0-9b6dc0b645bd
 
+## Illustartions by: 
+  - @revera.anna
+  - @natashalee777
+  - @borisgroh
+  - @kateryna.cherniavska
+  - @bright_arts
