@@ -95,12 +95,12 @@ body {
 .calculator {
   margin: 0 auto;
   padding: 10px;
-  border: solid 4px #021a48;
+  border: 4px solid #021a48;
   border-radius: 20px;
   box-shadow: 0 14px 28px rgb(0, 2, 0, 0.75);
 }
 .calc-screen {
-  border: solid 3px #021a48;
+  border: 3px solid #021a48;
   border-radius: 20px;
   background: #9ce9f6;
   color: #021a48;
@@ -124,6 +124,7 @@ body {
 }
 
 .btn {
+  position: relative;
   width: 100%;
   height: 100%;
   border-radius: 34px;
@@ -360,13 +361,28 @@ body {
   background: #4ec1d6;
 }
 
+.main-operation-btn:hover::before {
+  background: #ffaf01;
+  color: #021a48;
+}
+
+.additional-operation-btn:hover::before {
+  background: #fddb24;
+  color: #021a48;
+}
+
+.digit-btn:hover::before {
+  background: #4ec1d6;
+  color: #fff;
+}
+
 .digit-btn:hover {
   border: solid 1px #fddb24;
 }
 
-/* .btn:hover {
+.btn:hover {
   background-size: 100% 100%;
-  content-visibility: hidden;
+  color: transparent;
 }
 
 .btn-1:hover {
@@ -456,4 +472,19 @@ body {
 
 .switch-sign-btn:hover {
   background-image: url('../images/switch-sign-btn.jpg');
-} */
+}
+
+.btn:hover::before {
+  content: attr(value);
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  font-size: 25px;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
