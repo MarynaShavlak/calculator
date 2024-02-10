@@ -53,7 +53,7 @@ body {
   display: flex;
   position: absolute;
   padding: 30px;
-  bottom: -110px;
+  bottom: 20px;
   right: 0;
   width: 500px;
   border-radius: 5px;
@@ -65,7 +65,7 @@ body {
   transition: all 300ms cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 .error-notification-modal.isVisible {
-  bottom: -110px;
+  bottom: 20px;
   right: 0;
   width: 500px;
   transform: translateX(-10px);
