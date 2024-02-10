@@ -142,20 +142,54 @@ function handleDecimalInSecondOperand() {
 //_____________________________________________________________
 function checkIfMathOperationStarted() {
   let isSignBefore = false;
-  const firstDisplayElement = displayEl.value.slice(0, 1);
-  console.log('firstDisplayElemente: ', firstDisplayElement);
-  if (firstDisplayElement === '√') {
-    return true;
-  } else if (firstDisplayElement !== '√') {
-    const value = displayEl.value;
-    for (let i = 1; i < value.length; i++) {
-      if (fullOperationsList.includes(value[i])) {
-        isSignBefore = true;
-        break;
+  let firstDisplayElement;
+  firstDisplayElement = displayEl.value.slice(0, 1);
+  console.log('firstDisplayElement : ', firstDisplayElement);
+  if (firstDisplayElement === '(') {
+    console.log('перевырка операції: тут ДУЖКА');
+    firstDisplayElement = displayEl.value.slice(1, 2);
+    console.log('firstDisplayElemente: ', firstDisplayElement);
+    if (firstDisplayElement === '√') {
+      return true;
+    } else if (firstDisplayElement !== '√') {
+      const value = displayEl.value;
+      for (let i = 2; i < value.length; i++) {
+        if (fullOperationsList.includes(value[i])) {
+          isSignBefore = true;
+          break;
+        }
       }
+      return isSignBefore;
     }
-    return isSignBefore;
+  } else {
+    console.log('перевырка операції: тут ДУЖКИ НЕМАЄ');
+    console.log('firstDisplayElemente: ', firstDisplayElement);
+    if (firstDisplayElement === '√') {
+      return true;
+    } else if (firstDisplayElement !== '√') {
+      const value = displayEl.value;
+      for (let i = 1; i < value.length; i++) {
+        if (fullOperationsList.includes(value[i])) {
+          isSignBefore = true;
+          break;
+        }
+      }
+      return isSignBefore;
+    }
   }
+  //   console.log('firstDisplayElemente: ', firstDisplayElement);
+  //   if (firstDisplayElement === '√') {
+  //     return true;
+  //   } else if (firstDisplayElement !== '√') {
+  //     const value = displayEl.value;
+  //     for (let i = 1; i < value.length; i++) {
+  //       if (fullOperationsList.includes(value[i])) {
+  //         isSignBefore = true;
+  //         break;
+  //       }
+  //     }
+  //     return isSignBefore;
+  //   }
 }
 
 function checkIfNotRootOperationStarted() {
@@ -182,14 +216,17 @@ function onSwitchSignBtnPress() {
   const isSignBefore = checkIfMathOperationStarted();
   console.log('isSignBefore: ', isSignBefore);
   if (displayEl.value === '0') {
-    // displayEl.value = '-';
-    // savedNumber1 = '-';
-    console.log(
-      '%cнедопустимий формат: спочатку треба ввечти число, а потім вже змінювати його знак',
-      'color:red',
-    );
-    showNotification();
-    return;
+    console.log('перше число буде выдэмне');
+    savedNumber1 = '-';
+    const updatedDisplayValue = '(-';
+    console.log('updatedDisplayValue : ', updatedDisplayValue);
+    updateDisplayResult(updatedDisplayValue);
+    // console.log(
+    //   '%cнедопустимий формат: спочатку треба ввечти число, а потім вже змінювати його знак',
+    //   'color:red',
+    // );
+    // showNotification();
+    // return;
   } else if (!isSignBefore) {
     displayEl.value *= -1;
     savedNumber1 *= -1;
@@ -251,6 +288,29 @@ function onMathOperationBtnPress(el) {
   if (isRootTheFirstOnDisplay(clickedSign)) {
     console.log('це значить шо корінь на екрані йде перший');
     handleDisplayIfRootIsFirst(clickedSign);
+    const length = displayEl.value.length;
+    console.log('length: ', length);
+    if (displayEl.value.length === 2) {
+      for (let i = 1; i < displayEl.value.length; i++) {
+        if (fullOperationsList.includes(displayEl.value[i])) {
+          handleInvalidOperationsAfterRootSign();
+          return false; // String contains one of the forbidden operations
+        }
+      }
+    }
+
+    // if (
+    //   displayEl.value.length === 2 &&
+    //   (displayEl.value === '√-' || displayEl.value === '√+')
+    // ) {
+    //   console.log('тут треба зміна знаку');
+    // } else if (
+    //   displayEl.value.length === 2 &&
+    //   !(displayEl.value === '√-' || displayEl.value === '√+')
+    // ) {
+    //   handleInvalidOperationsAfterRootSign();
+    //   return;
+    // }
     updateMathOperationOptions(clickedSign);
     console.log(
       `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
@@ -262,6 +322,7 @@ function onMathOperationBtnPress(el) {
   console.log('isRoot: ', isRoot);
   if (isSquareRootOperation(clickedSign)) {
     handleSquareRootDisplay(clickedSign);
+
     updateMathOperationOptions(clickedSign);
     console.log(
       `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
@@ -374,10 +435,23 @@ function accululateWithoutOperSign(digitValue) {
     savedNumber1 = res;
     updateDisplayResult(`${getFirstCharacter(displayEl.value)}${res}`);
   } else {
-    accamulatedValue = displayEl.value + digitValue;
-    res = processAccumulatedValue(accamulatedValue);
-    savedNumber1 = res;
-    updateDisplayResult(`${res}`);
+    let firstDisplayElement = displayEl.value.slice(0, 1);
+    console.log('firstDisplayElement : ', firstDisplayElement);
+    if (firstDisplayElement === '(') {
+      accamulatedValue = displayEl.value.slice(1) + digitValue;
+      res = processAccumulatedValue(accamulatedValue);
+      savedNumber1 = res;
+      updateDisplayResult(`(${res}`);
+    } else {
+      accamulatedValue = displayEl.value + digitValue;
+      res = processAccumulatedValue(accamulatedValue);
+      savedNumber1 = res;
+      updateDisplayResult(`${res}`);
+    }
+    // accamulatedValue = displayEl.value + digitValue;
+    // res = processAccumulatedValue(accamulatedValue);
+    // savedNumber1 = res;
+    // updateDisplayResult(`${res}`);
   }
   //   const res = processAccumulatedValue(accamulatedValue);
   //   savedNumber1 = res;
@@ -533,9 +607,12 @@ function power(number1, number2) {
 }
 
 function squareRoot(number1, number2) {
-  if (number1 < 0 || number2 < 0) {
+  if (number2 < 0) {
     return 'ERROR';
   } else if (number1 > 0 && number2 > 0) {
+    const squareRootValue = Math.sqrt(number2);
+    return roundResult(multiply(number1, squareRootValue));
+  } else if (number1 < 0 && number2 > 0) {
     const squareRootValue = Math.sqrt(number2);
     return roundResult(multiply(number1, squareRootValue));
   } else {
@@ -655,6 +732,15 @@ function handleOperationWithoutSecondOperand() {
     '%cнедопустимий формат: немає другого числа для проведення розрахунків',
     'color:red',
   );
+  showNotification();
+}
+
+function handleInvalidOperationsAfterRootSign() {
+  console.log(
+    '%cнедопустимий формат: після знаку кореня не можна використовувати знаки : +, -, *, /, %, ^',
+    'color:red',
+  );
+  updateDisplayResult(`${displayEl.value.slice(0, -1)}`);
   showNotification();
 }
 
