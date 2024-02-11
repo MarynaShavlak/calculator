@@ -4,7 +4,17 @@ const MAX_INT_DIGITS_POS = 15; // integer part of positive number can include no
 const MAX_INT_DIGITS_NEG = 16; // integer part of negative number can include no more than 16 elements(15 digits and sign minus);
 const MAX_DECIMAL_DIGITS = 6; // decimal part of number can include no more than 6 digits;
 
-export function handlePositiveNumber(result) {
+export function processWithinLimits(value) {
+  let result;
+  if (value >= 0) {
+    result = handlePositiveNumber(value);
+  } else {
+    result = handleNegativeNumber(value);
+  }
+  return result;
+}
+
+function handlePositiveNumber(result) {
   const matchInPositiveNumber = result.match(/(\d*)\.(\d*)/); // we need to check whether number on display has decimal separator
 
   if (!matchInPositiveNumber) {
@@ -14,7 +24,7 @@ export function handlePositiveNumber(result) {
   }
 }
 
-export function handleNegativeNumber(result) {
+function handleNegativeNumber(result) {
   const matchInNegativeNumber = result.match(/(-)(\d*)\.(\d*)/); // we need to check whether number with decimal separator is positive or negative
 
   if (!matchInNegativeNumber) {
