@@ -30,13 +30,13 @@ export function resetCalculator() {
   updateDisplayResult(0);
   isOperatorLastPressed = false;
   operator = '';
-  operand1 = '';
-  operand2 = '';
+  updateOperand1('');
+  updateOperand2('');
   isNegativePower = false;
 }
 
 export function onDelBtnPress() {
-  if (isError()) {
+  if (isErrorOnDisplay()) {
     clearDisplay();
     return;
   }
@@ -95,18 +95,17 @@ export function onDecimalBtnPress() {
     return;
   } else if (canCreateFloatSecondOperand()) {
     console.log('FLOAT SECOND OPERAND CREATION');
-    addDotAfterOperator();
+    addDotInSecondOperand('0.');
   } else if (canAddDotInSecondOperand()) {
-    addDotInSecondOperand();
+    addDotInSecondOperand('.');
   }
 }
 
 export function onSwitchSignBtnPress() {
   const isSignBefore = hasMathOperators();
   console.log('isSignBefore: ', isSignBefore);
-  if (display.value === '0') {
-    console.log('перше число буде выдэмне');
-    operand1 = '-';
+  if (isEmptyDisplay()) {
+    updateOperand1('-');
     const updatedDisplayValue = '(-';
     console.log('updatedDisplayValue : ', updatedDisplayValue);
     updateDisplayResult(updatedDisplayValue);
@@ -121,7 +120,7 @@ export function onSwitchSignBtnPress() {
     operand1 *= -1;
   } else {
     console.log('тут треба поставити дужки');
-    operand2 = '-';
+    updateOperand2('-');
     const updatedDisplayValue = display.value + '(-';
     console.log('updatedDisplayValue : ', updatedDisplayValue);
     updateDisplayResult(updatedDisplayValue);
@@ -159,7 +158,7 @@ export function onMathOperationBtnPress(el) {
 
     'background-color: yellow',
   );
-  if (isError()) {
+  if (isErrorOnDisplay()) {
     clearDisplay();
     return;
   }
@@ -255,7 +254,14 @@ export function onResultBtnPress() {
   console.log(' після настискання на   = operand2: ', operand2);
 }
 
-//________get OPERANDS functions________
+//________ OPERANDS functions________
+
+function updateOperand1(value) {
+  operand1 = value;
+}
+function updateOperand2(value) {
+  operand2 = value;
+}
 
 function getNumber1() {
   //   return operand1 ? Number(operand1) : 0;
@@ -276,7 +282,7 @@ function getNumber2() {
 //_____________________Delete button functions________________________//
 
 function deleteFirstOperandCharacter(updatedValue) {
-  operand1 = updatedValue;
+  updateOperand1(updatedValue);
   resetOperatorSettings();
 }
 function deleteSecondOperandTotally() {
@@ -287,7 +293,7 @@ function deleteSecondOperandTotally() {
     sign = getLastCharacter(display.value);
   }
   updateOperatorSettings(sign);
-  operand2 = '';
+  updateOperand2('');
 }
 
 function deleteSecondOperandCharacter() {
@@ -309,7 +315,7 @@ function canAddDotInFirstOperand() {
     isRootFirstOnDisplay,
   );
   if (isRootFirstOnDisplay && !operand1) {
-    operand1 = '0';
+    updateOperand1('0');
     return true;
   }
 
@@ -326,21 +332,17 @@ function canAddDotInSecondOperand() {
   return !!(operand2 && !String(operand2).includes('.'));
 }
 function addDotInFirstOperand() {
-  if (display.value !== '') {
-    display.value += '.';
-  } else {
-    display.value += '0.';
-  }
+  const dotValue = display.value !== '' ? '.' : '0.';
+  const newDisplayValue = display.value + dotValue;
+  updateDisplayResult(newDisplayValue);
+  const updatedOperand = operand1 + '.';
+  updateOperand1(updatedOperand);
+}
 
-  operand1 += '.';
-}
-function addDotAfterOperator() {
-  display.value += '0.';
-  operand2 = '0.';
-}
-function addDotInSecondOperand() {
-  display.value += '.';
-  operand2 += '.';
+function addDotInSecondOperand(dotValue) {
+  const newDisplayValue = display.value + dotValue;
+  updateDisplayResult(newDisplayValue);
+  updateOperand2(dotValue);
 }
 
 //_____________________________________________________________
@@ -396,8 +398,11 @@ function checkIfRootOperationStarted() {
   return display.value.includes('√') && operator !== '√';
 }
 
-function isError() {
+function isErrorOnDisplay() {
   return display.value === 'ERROR';
+}
+function isEmptyDisplay() {
+  return display.value === '0';
 }
 
 function checkForInvalidRootOperation() {
@@ -426,7 +431,7 @@ function updateDisplayResult(value) {
 }
 
 function resetDisplayValueIfNeed() {
-  if (isError()) {
+  if (isErrorOnDisplay()) {
     clearDisplay();
     return;
   }
@@ -480,7 +485,7 @@ function updateOperatorSettings(clickedSign) {
 //______________accumulate digits functions________________//
 
 function accumulateDigits(digit) {
-  if (display.value === '0') {
+  if (isEmptyDisplay()) {
     addFirstDigitOnDisplay(digit);
     return;
   }
@@ -522,7 +527,7 @@ function accumulateWithOperator(digit) {
   );
   const acc = operand2 + digit;
   const result = processWithinLimits(acc);
-  operand2 = result;
+  updateOperand2(result);
   console.log(
     `%cзначення 'operand1' після накопиченя у ДРУГИЙ операнд:${operand1}`,
     'background-color: #BADA55;font-weight: 700',
@@ -557,7 +562,7 @@ function accumulateWithRootFirst(digit) {
   const firstCharacter = getFirstCharacter(display.value);
   const acc = operand1 + digit;
   const result = processWithinLimits(acc);
-  operand1 = result;
+  updateOperand1(result);
   updateDisplayResult(`${firstCharacter}${result}`);
 }
 
@@ -568,12 +573,13 @@ function accumulateWithNonRootFirst(digit) {
   if (firstDisplayElement === '(') {
     acc = deleteFirstCharacter(display.value) + digit;
     result = processWithinLimits(acc);
-    operand1 = result;
+    updateOperand1(result);
     updateDisplayResult(`(${result}`);
   } else {
     acc = display.value + digit;
     result = processWithinLimits(acc);
-    operand1 = result;
+    updateOperand1(result);
+
     updateDisplayResult(`${result}`);
   }
 }
@@ -600,7 +606,7 @@ function displayStartsWithRootSign() {
 }
 
 function addFirstDigitOnDisplay(digit) {
-  operand1 = digit;
+  updateOperand1(digit);
   updateDisplayResult(digit);
 }
 
@@ -639,7 +645,7 @@ function makeSqrRootOperation(value1, value2) {
       'background-color: #7ECCEC; font-weight:500',
     );
     result = calculateResult(number1, value2, operator);
-    operand1 = result;
+    updateOperand1(result);
   } else {
     const number2 = calculateResult(0, value2, '√');
     console.log(
@@ -648,10 +654,10 @@ function makeSqrRootOperation(value1, value2) {
     );
     if (number2 === 'ERROR') {
       result = 'ERROR';
-      operand1 = '';
+      updateOperand1('');
     } else {
       result = calculateResult(value1, number2, operator);
-      operand1 = result;
+      updateOperand1(result);
     }
   }
   console.log(
@@ -660,7 +666,7 @@ function makeSqrRootOperation(value1, value2) {
   );
 
   updateDisplayResult(result);
-  operand2 = '';
+  updateOperand2('');
 }
 
 function makeNotRootOperation(value1, value2) {
@@ -683,6 +689,6 @@ function makeNotRootOperation(value1, value2) {
     'background-color: #CC99FF; font-weight:900',
   );
   updateDisplayResult(result);
-  operand1 = result;
-  operand2 = '';
+  updateOperand1(result);
+  updateOperand2('');
 }
