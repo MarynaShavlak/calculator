@@ -117,10 +117,10 @@ input {
   position: absolute;
   top: 10px;
   left: 10px;
-  font-size: 40px;
   cursor: pointer;
   transition: color 300ms cubic-bezier(0.075, 0.82, 0.165, 1);
 }
+
 .copy-icon:hover {
   color: #ffaf01;
 }
@@ -150,7 +150,26 @@ input {
   border: solid 3px #021a48;
 }
 
+.btn:hover::before {
+  content: attr(value);
+  position: absolute;
+  padding: 5px;
+  border-radius: 50%;
+}
+
 @media screen and (min-width: 375px) and (max-width: 767px) {
+  .btn:hover::before {
+    bottom: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    font-size: 15px;
+    padding: 3px;
+  }
+
+  .copy-icon {
+    font-size: 20px;
+  }
   .calculator {
     display: grid;
     width: 335px;
@@ -238,6 +257,17 @@ input {
 }
 
 @media screen and (min-width: 768px) and (max-width: 1199px) {
+  .copy-icon {
+    font-size: 30px;
+  }
+  .btn:hover::before {
+    bottom: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    padding: 5px;
+  }
   .calculator {
     display: grid;
     width: 700px;
@@ -322,6 +352,17 @@ input {
 }
 
 @media screen and (min-width: 1200px) {
+  .copy-icon {
+    font-size: 40px;
+  }
+  .btn:hover::before {
+    bottom: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    font-size: 25px;
+    padding: 5px;
+  }
   .calculator {
     display: grid;
     grid-template-rows: 2fr 6fr;
@@ -486,19 +527,4 @@ input {
 
 .switch-sign-btn:hover {
   background-image: url('../images/switch-sign-btn.jpg');
-}
-
-.btn:hover::before {
-  content: attr(value);
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
-  font-size: 25px;
-  padding: 5px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }

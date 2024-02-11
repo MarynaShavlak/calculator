@@ -1,6 +1,22 @@
-const NOTIFICATION_DELAY = 3000;
-let timeoutID = null;
-const notificationEl = document.querySelector('.error-notification-modal');
+import {
+  showInvalidOperAfterRootSignNotification,
+  showOperWithoutFirstOperandNotification,
+  showOperWithoutSecondOperandNotification,
+  showInvalidPercentOrPowerOperNotification,
+} from './notifications.js';
+import {
+  deleteLastCharacter,
+  deleteFirstCharacter,
+  getFirstCharacter,
+  getSecondCharacter,
+  getLastCharacter,
+  roundResult,
+} from './utils.js';
+import {
+  handlePositiveNumber,
+  handleNegativeNumber,
+} from './digits-limits-functions.js';
+
 const displayEl = document.querySelector('#main-calc-display');
 const buttonsTablo = document.querySelector('.buttons-tablo');
 const resultOperationBtn = document.querySelector('#result-btn');
@@ -9,10 +25,6 @@ const deleteBtn = document.querySelector('#delete-btn');
 const decimalBtn = document.querySelector('#decimal-btn');
 const switchSignBtn = document.querySelector('#switch-sign-btn');
 const copyIcon = document.querySelector('.copy-icon');
-const MAX_INT_DIGITS_POS = 15; // integer part of positive number can include no more than 15 digits;
-const MAX_INT_DIGITS_NEG = 16; // integer part of negative number can include no more than 16 elements(15 digits and sign minus);
-const MAX_DECIMAL_DIGITS = 6; // decimal part of number can include no more than 6 digits;
-const ROUNDING_PRECISION = Math.pow(10, 6); // we want to round decimal part of our result on display to 6 digits
 const fullOperationsList = ['-', '+', '*', '/', '√', '%', '^'];
 const standardOperationsList = ['-', '+', '*', '/', '√'];
 let mathOperationBtnIsLastPressed = false;
@@ -38,8 +50,6 @@ buttonsTablo.addEventListener('click', function (e) {
     onMathOperationBtnPress(clickedEl);
   }
 });
-
-notificationEl.addEventListener('click', onNotificationClick);
 
 function resetCalculator() {
   updateDisplayResult(0);
@@ -84,17 +94,6 @@ function onDelBtnPress() {
 function deleteFirstOperandCharacter(updatedValue) {
   savedNumber1 = updatedValue;
   resetOperationState();
-}
-
-function deleteLastCharacter(str) {
-  return str.slice(0, -1);
-}
-
-function getLastCharacter(str) {
-  return str.slice(-1);
-}
-function getFirstCharacter(str) {
-  return str.slice(0, 1);
 }
 
 //__________________float numbers functins_________________//
@@ -157,11 +156,11 @@ function handleDecimalInSecondOperand() {
 function checkIfMathOperationStarted() {
   let isSignBefore = false;
   let firstDisplayElement;
-  firstDisplayElement = displayEl.value.slice(0, 1);
+  firstDisplayElement = getFirstCharacter(displayEl.value);
   console.log('firstDisplayElement : ', firstDisplayElement);
   if (firstDisplayElement === '(') {
     console.log('перевырка операції: тут ДУЖКА');
-    firstDisplayElement = displayEl.value.slice(1, 2);
+    firstDisplayElement = getSecondCharacter(displayEl.value);
     console.log('firstDisplayElemente: ', firstDisplayElement);
     if (firstDisplayElement === '√') {
       return true;
@@ -330,7 +329,7 @@ function onMathOperationBtnPress(el) {
     if (displayEl.value.length === 2) {
       for (let i = 1; i < displayEl.value.length; i++) {
         if (fullOperationsList.includes(displayEl.value[i])) {
-          updateDisplayResult(`${displayEl.value.slice(0, -1)}`);
+          updateDisplayResult(`${deleteLastCharacter(displayEl.value)}`);
 
           showInvalidOperAfterRootSignNotification();
           return false;
@@ -373,15 +372,15 @@ function onResultBtnPress() {
   console.log('mathOperationCode: ', mathOperationCode);
   if (isOperationWithoutSecondOperand()) {
     console.log('коли тисне а "=", то Є 1 operand');
-    handleOperationWithoutSecondOperand();
+    showOperWithoutSecondOperandNotification();
   } else {
     console.log('коли тисне а "=", то Є 2 operands');
-    handleOperationWithTwoOperands(value1, value2);
+    makeOperWithTwoOperands(value1, value2);
+    resetOperationState();
   }
 
   console.log('після настискання на  =  savedNumber1: ', savedNumber1);
   console.log(' після настискання на   = savedNumber2: ', savedNumber2);
-  resetOperationState();
 }
 
 function updateDisplayResult(value) {
@@ -462,10 +461,10 @@ function accululateWithoutOperSign(digitValue) {
     savedNumber1 = res;
     updateDisplayResult(`${getFirstCharacter(displayEl.value)}${res}`);
   } else {
-    let firstDisplayElement = displayEl.value.slice(0, 1);
+    let firstDisplayElement = getFirstCharacter(displayEl.value);
     console.log('firstDisplayElement : ', firstDisplayElement);
     if (firstDisplayElement === '(') {
-      accamulatedValue = displayEl.value.slice(1) + digitValue;
+      accamulatedValue = deleteFirstCharacter(displayEl.value) + digitValue;
       res = processAccumulatedValue(accamulatedValue);
       savedNumber1 = res;
       updateDisplayResult(`(${res}`);
@@ -579,10 +578,6 @@ function calculateResult(number1, number2, operation) {
   return result;
 }
 
-function roundResult(value) {
-  return Math.round(value * ROUNDING_PRECISION) / ROUNDING_PRECISION;
-}
-
 function add(number1, number2) {
   const numbersSum = Number(number1) + Number(number2);
   return roundResult(numbersSum);
@@ -649,77 +644,6 @@ function squareRoot(number1, number2) {
   }
 }
 
-//____________________________DIGITS ACCUMULATION FUNCTIONS ______________________________________//
-
-function handlePositiveNumber(result) {
-  const matchInPositiveNumber = result.match(/(\d*)\.(\d*)/); // we need to check whether number on display has decimal separator
-
-  if (!matchInPositiveNumber) {
-    return handlePositiveWholeNumber(result);
-  } else {
-    return handlePositiveNonWholeNumber(matchInPositiveNumber);
-  }
-}
-
-function handlePositiveWholeNumber(result) {
-  const integerPart =
-    result.length > MAX_INT_DIGITS_POS
-      ? result.slice(0, MAX_INT_DIGITS_POS)
-      : result;
-  return integerPart;
-}
-
-function handlePositiveNonWholeNumber(matchInPositiveNumber) {
-  const integerPartString = matchInPositiveNumber[1];
-  const decimalPartString = matchInPositiveNumber[2];
-
-  const integerPart =
-    integerPartString?.length > MAX_INT_DIGITS_POS
-      ? integerPartString.slice(0, MAX_INT_DIGITS_POS)
-      : integerPartString;
-  const decimalPart =
-    decimalPartString?.length > MAX_DECIMAL_DIGITS
-      ? decimalPartString.slice(0, MAX_DECIMAL_DIGITS)
-      : decimalPartString;
-
-  return `${integerPart}.${decimalPart}`;
-}
-
-function handleNegativeNumber(result) {
-  const matchInNegativeNumber = result.match(/(-)(\d*)\.(\d*)/); // we need to check whether number with decimal separator is positive or negative
-
-  if (!matchInNegativeNumber) {
-    return handleNegativeWholeNumber(result);
-  } else {
-    return handleNegativeNonWholeNumber(matchInNegativeNumber);
-  }
-}
-
-function handleNegativeWholeNumber(result) {
-  const integerPart =
-    result.length > MAX_INT_DIGITS_NEG
-      ? result.slice(0, MAX_INT_DIGITS_NEG)
-      : result;
-  return integerPart;
-}
-
-function handleNegativeNonWholeNumber(matchInNegativeNumber) {
-  const signMinusPartString = matchInNegativeNumber[1];
-  const integerPartString = matchInNegativeNumber[2];
-  const decimalPartString = matchInNegativeNumber[3];
-
-  const integerPart =
-    integerPartString?.length > MAX_INT_DIGITS_NEG
-      ? integerPartString.slice(0, MAX_INT_DIGITS_NEG)
-      : integerPartString;
-  const decimalPart =
-    decimalPartString?.length > MAX_DECIMAL_DIGITS
-      ? decimalPartString.slice(0, MAX_DECIMAL_DIGITS)
-      : decimalPartString;
-
-  return `${signMinusPartString ?? ''}${integerPart}.${decimalPart}`;
-}
-
 // ________________________________________UNIQUE MATH CASES FUNCTIONS ________________//
 function isInvalidPercentOrPowerOperation(clickedSign) {
   return (
@@ -727,24 +651,8 @@ function isInvalidPercentOrPowerOperation(clickedSign) {
   );
 }
 
-function showInvalidPercentOrPowerOperNotification() {
-  console.log(
-    '%cнедопустимий формат: після знаків математичних операцій на можна ставити % та ^',
-    'color:red',
-  );
-  showNotification();
-}
-
 function isOperationWithoutFirstOperand(clickedSign) {
   return mathOperationCode === '' && clickedSign !== '√' && !savedNumber1;
-}
-
-function showOperWithoutFirstOperandNotification() {
-  console.log(
-    '%cнедопустимий формат: не можна проводити додавання, віднімання, множення, ділення, розрахунок відсотка та підняття до степеня, не маючи першого операнда',
-    'color:red',
-  );
-  showNotification();
 }
 
 function isOperationWithoutSecondOperand() {
@@ -752,23 +660,6 @@ function isOperationWithoutSecondOperand() {
     standardOperationsList.includes(mathOperationCode) &&
     mathOperationBtnIsLastPressed
   );
-}
-
-function handleOperationWithoutSecondOperand() {
-  console.log(
-    '%cнедопустимий формат: немає другого числа для проведення розрахунків',
-    'color:red',
-  );
-  showNotification();
-}
-
-function showInvalidOperAfterRootSignNotification() {
-  console.log(
-    '%cнедопустимий формат: після знаку кореня не можна використовувати знаки : +, -, *, /, %, ^',
-    'color:red',
-  );
-  //   updateDisplayResult(`${displayEl.value.slice(0, -1)}`);
-  showNotification();
 }
 
 function isSquareRootOperation(clickedSign) {
@@ -786,15 +677,6 @@ function isRootTheFirstOnDisplay(clickedSign) {
   console.log('iS ROOT FIRST  on: mathOperationCode: ', mathOperationCode);
   return getFirstCharacter(displayEl.value) === '√';
   //   return mathOperationCode === '' && clickedSign === '√';
-}
-
-function handleSquareRootDisplay(clickedSign) {
-  console.log(
-    'тут треба зробити операцію із першим числом та результатом кореня другого',
-  );
-  console.log('savedNumber1: ', savedNumber1);
-  console.log(' savedNumber2: ', savedNumber2);
-  updateDisplayResult(`${savedNumber1}${mathOperationCode}${clickedSign}`);
 }
 
 function makeSqrRootOperation(value1, value2) {
@@ -839,12 +721,42 @@ function makeSqrRootOperation(value1, value2) {
     `%cрезультат розрахунку, коли на екрані є корінь:${result}`,
     'background-color: #7ECCEC; font-weight:900',
   );
-  //   console.log(
-  //     '',
-  //     result,
-  //   );
+
   updateDisplayResult(result);
   savedNumber2 = '';
+}
+
+function makeNotRootOperation(value1, value2) {
+  console.log(
+    `%cin makeNotRootOperation operand1 :${value1}`,
+    'background-color: #CC99FF; font-weight:700',
+  );
+  console.log(
+    `%cin makeNotRootOperation operand2 :${value2}`,
+    'background-color: #CC99FF; font-weight:700',
+  );
+  console.log(
+    `%cin makeNotRootOperation АКТИВНА ОПЕРАЦІЯ :${mathOperationCode}`,
+    'background-color: #CC99FF; font-weight:700',
+  );
+  const result = calculateResult(value1, value2, mathOperationCode);
+
+  console.log(
+    `%cрезультат розрахунку, коли на екрані НЕМАЄ кореня:${result}`,
+    'background-color: #CC99FF; font-weight:900',
+  );
+  updateDisplayResult(result);
+  savedNumber1 = result;
+  savedNumber2 = '';
+}
+
+function handleSquareRootDisplay(clickedSign) {
+  console.log(
+    'тут треба зробити операцію із першим числом та результатом кореня другого',
+  );
+  console.log('savedNumber1: ', savedNumber1);
+  console.log(' savedNumber2: ', savedNumber2);
+  updateDisplayResult(`${savedNumber1}${mathOperationCode}${clickedSign}`);
 }
 
 function handleDisplayIfRootIsFirst(clickedSign) {
@@ -856,29 +768,12 @@ function handleDisplayIfRootIsFirst(clickedSign) {
   updateDisplayResult(`${displayEl.value}${clickedSign}`);
 }
 
-function handleRegularOperation(value1, value2) {
-  console.log('IN handleRegularOperation value1: ', value1);
-  console.log('IN handleRegularOperation value2: ', value2);
-  console.log(
-    'when click on "=" and NO ROOT, the sign of operation is',
-    mathOperationCode,
-  );
-  const result = calculateResult(value1, value2, mathOperationCode);
-  console.log(
-    'when click on "=" and NO ROOT, the result of operation is ',
-    result,
-  );
-  updateDisplayResult(result);
-  savedNumber1 = result;
-  savedNumber2 = '';
-}
-
 function handleFirstDigitClick(digitValue) {
   savedNumber1 = digitValue;
   updateDisplayResult(digitValue);
 }
 
-function handleOperationWithTwoOperands(value1, value2) {
+function makeOperWithTwoOperands(value1, value2) {
   console.log('Знак коли тисну "=": ', mathOperationCode);
   if (mathOperationCode !== '') {
     const isRootOnDispay = checkIfRootOperationStarted();
@@ -886,26 +781,9 @@ function handleOperationWithTwoOperands(value1, value2) {
     if (isRootOnDispay) {
       makeSqrRootOperation(value1, value2);
     } else {
-      handleRegularOperation(value1, value2);
+      makeNotRootOperation(value1, value2);
     }
   }
-}
-
-//______________Nitification functions ______________________________________
-function onNotificationClick() {
-  hideNotification();
-  clearTimeout(timeoutID);
-}
-
-function showNotification() {
-  notificationEl.classList.add('isVisible');
-  timeoutID = setTimeout(() => {
-    hideNotification();
-  }, NOTIFICATION_DELAY);
-}
-
-function hideNotification() {
-  notificationEl.classList.remove('isVisible');
 }
 
 // ______Copy value to clipboard from display ______//
