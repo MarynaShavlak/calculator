@@ -1,7 +1,7 @@
 const notificationEl = document.querySelector('.error-notification-modal');
+notificationEl.addEventListener('click', onNotificationClick);
 const NOTIFICATION_DELAY = 3000;
 let timeoutID = null;
-notificationEl.addEventListener('click', onNotificationClick);
 
 //______________Nitification functions ______________________________________
 export function onNotificationClick() {

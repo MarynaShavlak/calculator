@@ -28,7 +28,7 @@ const copyIcon = document.querySelector('.copy-icon');
 const fullOperationsList = ['-', '+', '*', '/', '√', '%', '^'];
 const standardOperationsList = ['-', '+', '*', '/', '√'];
 let mathOperationBtnIsLastPressed = false;
-let mathOperationCode = '';
+let operator = '';
 let savedNumber1 = '';
 let savedNumber2 = '';
 let isNegativePower;
@@ -54,7 +54,7 @@ buttonsTablo.addEventListener('click', function (e) {
 function resetCalculator() {
   updateDisplayResult(0);
   mathOperationBtnIsLastPressed = false;
-  mathOperationCode = '';
+  operator = '';
   savedNumber1 = '';
   savedNumber2 = '';
   isNegativePower = false;
@@ -67,44 +67,76 @@ function onDelBtnPress() {
     return;
   }
   const updatedValue = deleteLastCharacter(displayEl.value);
+  console.log(
+    `%cнове значення яке бачимо на дісплеї ПІСЛЯ очищення одного елемента ${updatedValue}`,
+    'color:#FF1493; font-weight:700',
+  );
   const isSecondOperandTotallyDeleted =
     checkIfMathOperationStarted() && savedNumber2.length < 2;
-  console.log('updatedValue: ', updatedValue);
   updateDisplayResult(updatedValue);
 
-  console.log('BEFORE DELETION mathOperationCode: ', mathOperationCode);
-  console.log('BEFORE DELETION savedNumber1: ', savedNumber1);
-  console.log('BEFORE DELETION  savedNumber2: ', savedNumber2);
+  console.log(
+    `%cзsavedNumber1 ПЕРЕД очищенням одного елемента ${savedNumber1}`,
+    'color:#FF1493; font-weight:700',
+  );
+  console.log(
+    `%csavedNumber2 ПЕРЕД очищенням одного елемента ${savedNumber2}`,
+    'color:#FF1493; font-weight:700',
+  );
+  console.log(
+    `%coperator ПЕРЕД очищенням одного елемента ${operator}`,
+    'color:#FF1493; font-weight:700',
+  );
+
   if (!savedNumber2) {
     deleteFirstOperandCharacter(updatedValue);
   } else if (isSecondOperandTotallyDeleted) {
-    const sign = getLastCharacter(displayEl.value);
-    updateMathOperationOptions(sign);
-    console.log('sign: ', sign);
-    savedNumber2 = '';
+    deleteSecondOperandTotally();
   } else {
-    console.log('є другий операнд');
-    savedNumber2 = deleteLastCharacter(savedNumber2);
+    deleteSecondOperandCharacter();
   }
-  console.log('AFTER DELETION savedNumber1: ', savedNumber1);
-  console.log('AFTER DELETION savedNumber2: ', savedNumber2);
-  console.log('AFTER DELETION mathOperationCode: ', mathOperationCode);
+  console.log(
+    `%cзsavedNumber1 ПІСЛЯ очищення одного елемента ${savedNumber1}`,
+    'color:#FF1493; font-weight:700',
+  );
+  console.log(
+    `%csavedNumber2 ПІСЛЯ очищення одного елемента ${savedNumber2}`,
+    'color:#FF1493; font-weight:700',
+  );
+  console.log(
+    `%coperator ПІСЛЯ очищення одного елемента ${operator}`,
+    'color:#FF1493; font-weight:700',
+  );
 }
 
 function deleteFirstOperandCharacter(updatedValue) {
   savedNumber1 = updatedValue;
   resetOperationState();
 }
+function deleteSecondOperandTotally() {
+  let sign = getLastCharacter(displayEl.value);
+  if (sign === '(') {
+    const updatedValue = deleteLastCharacter(displayEl.value);
+    updateDisplayResult(updatedValue);
+    sign = getLastCharacter(displayEl.value);
+  }
+  updateMathOperationOptions(sign);
+  savedNumber2 = '';
+}
+
+function deleteSecondOperandCharacter() {
+  savedNumber2 = deleteLastCharacter(savedNumber2);
+}
 
 //__________________float numbers functins_________________//
 function onDecimalBtnPress() {
   if (canAddDotInFirstOperand()) {
-    handleDecimalInFirstOperand();
+    addDotInFirstOperand();
     return;
   } else if (canCreateFloatSecondOperand()) {
-    handleDecimalClickWithSignBefore();
+    addDotAfterOperator();
   } else if (canAddDotInSecondOperand()) {
-    handleDecimalInSecondOperand();
+    addDotInSecondOperand();
   }
 }
 
@@ -137,17 +169,17 @@ function canAddDotInSecondOperand() {
   return savedNumber2 && !String(savedNumber2).includes('.');
 }
 
-function handleDecimalInFirstOperand() {
-  displayEl.value += '.';
+function addDotInFirstOperand() {
+  displayEl.value += '0.';
   savedNumber1 += '.';
 }
 
-function handleDecimalClickWithSignBefore() {
+function addDotAfterOperator() {
   displayEl.value += '0.';
   savedNumber2 = '0.';
 }
 
-function handleDecimalInSecondOperand() {
+function addDotInSecondOperand() {
   displayEl.value += '.';
   savedNumber2 += '.';
 }
@@ -159,91 +191,33 @@ function checkIfMathOperationStarted() {
   if (firstDisplayElement === '(') {
     console.log('перевырка операції: тут ДУЖКА');
     return checkMathOperationAfterBracket();
-    // firstDisplayElement = getSecondCharacter(displayEl.value);
-    // console.log('firstDisplayElemente: ', firstDisplayElement);
-    // if (firstDisplayElement === '√') {
-    //   return true;
-    // } else if (firstDisplayElement !== '√') {
-    //   const value = displayEl.value;
-    //   for (let i = 2; i < value.length; i++) {
-    //     if (fullOperationsList.includes(value[i])) {
-    //       isSignBefore = true;
-    //       break;
-    //     }
-    //   }
-    //   return isSignBefore;
-    // }
   } else {
     console.log('перевырка операції: тут ДУЖКИ НЕМАЄ');
     return checkMathOperationWithoutBracket();
-    // console.log('firstDisplayElemente: ', firstDisplayElement);
-    // if (firstDisplayElement === '√') {
-    //   return true;
-    // } else if (firstDisplayElement !== '√') {
-    //   const value = displayEl.value;
-    //   for (let i = 1; i < value.length; i++) {
-    //     if (fullOperationsList.includes(value[i])) {
-    //       isSignBefore = true;
-    //       break;
-    //     }
-    //   }
-    //   return isSignBefore;
-    // }
   }
 }
 
 function checkMathOperationAfterBracket() {
   const firstDisplayElement = getSecondCharacter(displayEl.value);
-  console.log('firstDisplayElemente: ', firstDisplayElement);
   if (firstDisplayElement === '√') {
     return true;
   } else {
     checkForOperation();
-    // const value = displayEl.value;
-    // for (let i = 2; i < value.length; i++) {
-    //   if (fullOperationsList.includes(value[i])) {
-    //     isSignBefore = true;
-    //     break;
-    //   }
-    // }
-    // return isSignBefore;
   }
 }
 
 function checkMathOperationWithoutBracket() {
   const firstDisplayElement = getFirstCharacter(displayEl.value);
-  console.log('firstDisplayElemente: ', firstDisplayElement);
   if (firstDisplayElement === '√') {
     return true;
   } else {
-    // const value = displayEl.value;
-    // for (let i = 1; i < value.length; i++) {
-    //   if (fullOperationsList.includes(value[i])) {
-    //     isSignBefore = true;
-    //     break;
-    //   }
-    // }
-    // return isSignBefore;
     return checkForOperation();
   }
 }
 
 function checkForOperation() {
-  //     const value = displayEl.value;
-  //     const startIndex = value[0] === '(' ? 2 : 1;
-  //   let isSignBefore = false;
-
-  //   for (let i = startIndex; i < value.length; i++) {
-  //     if (fullOperationsList.includes(value[i])) {
-  //       isSignBefore = true;
-  //       break;
-  //     }
-  //   }
-
-  //   return isSignBefore;
   const value = displayEl.value;
   const startIndex = value.startsWith('(') ? 2 : 1;
-
   return value
     .slice(startIndex)
     .split('')
@@ -263,7 +237,7 @@ function checkIfNotRootOperationStarted() {
 }
 
 function checkIfRootOperationStarted() {
-  return displayEl.value.includes('√') && mathOperationCode !== '√';
+  return displayEl.value.includes('√') && operator !== '√';
 }
 
 function isError() {
@@ -307,6 +281,7 @@ function onDigitPress(el) {
 
 function onMathOperationBtnPress(el) {
   const clickedSign = el.value;
+
   console.log(
     `%csavedNumber1 при кліці на мат.операцію:  ${savedNumber1}`,
 
@@ -318,7 +293,7 @@ function onMathOperationBtnPress(el) {
     'background-color: pink',
   );
   console.log(
-    `%cякий знак був записаний перед кліком на інший знак?:  ${mathOperationCode}`,
+    `%cякий знак був записаний перед кліком на інший знак?:  ${operator}`,
 
     'background-color: yellow',
   );
@@ -348,7 +323,7 @@ function onMathOperationBtnPress(el) {
   if (isInvalidPercentOrPowerOperation(clickedSign)) {
     showInvalidPercentOrPowerOperNotification();
     console.log(
-      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
+      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${operator}`,
       'font-size: larger; font-weight: 900; background-color: yellow',
     );
     return;
@@ -357,56 +332,66 @@ function onMathOperationBtnPress(el) {
   if (isOperationWithoutFirstOperand(clickedSign)) {
     showOperWithoutFirstOperandNotification();
     console.log(
-      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
+      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${operator}`,
       'font-size: larger; font-weight: 900; background-color: yellow',
     );
     return;
   }
-
-  const isRootFirstOnDisplay = isRootTheFirstOnDisplay(clickedSign);
-  console.log('isRootFirstOnDisplay: ', isRootFirstOnDisplay);
 
   if (isRootTheFirstOnDisplay(clickedSign)) {
-    console.log('це значить шо корінь на екрані йде перший');
-    handleDisplayIfRootIsFirst(clickedSign);
-    const length = displayEl.value.length;
-    console.log('length: ', length);
-    if (displayEl.value.length === 2) {
-      for (let i = 1; i < displayEl.value.length; i++) {
-        if (fullOperationsList.includes(displayEl.value[i])) {
-          updateDisplayResult(`${deleteLastCharacter(displayEl.value)}`);
-
-          showInvalidOperAfterRootSignNotification();
-          return false;
-        }
-      }
+    const isRootFirstOnDisplay = isRootTheFirstOnDisplay(clickedSign);
+    console.log(
+      `%cчи є корінь на початку дісплея?:  ${isRootFirstOnDisplay}`,
+      'font-size: larger; font-weight: 900; background-color: yellow',
+    );
+    updateDisplayResult(`${displayEl.value}${clickedSign}`);
+    const isValidRoot = checkForInvalidRootOperation();
+    if (isValidRoot) {
+      updateMathOperationOptions(clickedSign);
     }
-
-    updateMathOperationOptions(clickedSign);
     console.log(
-      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
+      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${operator}`,
       'font-size: larger; font-weight: 900; background-color: yellow',
     );
     return;
   }
-  const isRoot = isSquareRootOperation(clickedSign);
-  console.log('isRoot: ', isRoot);
+
   if (isSquareRootOperation(clickedSign)) {
-    handleSquareRootDisplay(clickedSign);
-
-    updateMathOperationOptions(clickedSign);
+    const isRoot = isSquareRootOperation(clickedSign);
     console.log(
-      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
+      `%cчи почалась  операція із коренем?:  ${isRoot}`,
+      'font-size: larger; font-weight: 900; background-color: yellow',
+    );
+    updateMathOperationOptions(clickedSign);
+    updateDisplayResult(`${savedNumber1}${operator}${clickedSign}`);
+    console.log(
+      `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку на мат.опер.?:  ${operator}`,
       'font-size: larger; font-weight: 900; background-color: yellow',
     );
     return;
   }
+
   updateMathOperationOptions(clickedSign);
-  updateDisplayResult(`${savedNumber1}${mathOperationCode}`);
+  updateDisplayResult(`${savedNumber1}${operator}`);
   console.log(
-    `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
+    `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку на мат.опер.?:  ${operator}`,
     'font-size: larger; font-weight: 900; background-color: yellow',
   );
+}
+
+function checkForInvalidRootOperation() {
+  const displayLength = displayEl.value.length;
+  if (displayLength === 2) {
+    for (let i = 1; i < displayLength; i++) {
+      if (fullOperationsList.includes(displayEl.value[i])) {
+        updateDisplayResult(`${deleteLastCharacter(displayEl.value)}`);
+        resetOperationState();
+        showInvalidOperAfterRootSignNotification();
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 function onResultBtnPress() {
@@ -414,7 +399,7 @@ function onResultBtnPress() {
   const value2 = getNumber2();
   console.log('value1: ', value1);
   console.log('value2 : ', value2);
-  console.log('mathOperationCode: ', mathOperationCode);
+  console.log('operator: ', operator);
   if (isOperationWithoutSecondOperand()) {
     console.log('коли тисне а "=", то Є 1 operand');
     showOperWithoutSecondOperandNotification();
@@ -442,11 +427,7 @@ function resetDisplayValueIfNeed() {
     return;
   }
   if (mathOperationBtnIsLastPressed) {
-    // if the last button on which user have clicked before was math operation button
-    // updateDisplayResult(''); // we need to delete all the digits from display
-    // updateDisplayResult(`${savedNumber1}${mathOperationCode}`); // !!!!!!!!!!!!!!!!add new
     mathOperationBtnIsLastPressed = false;
-    // now math operation button is not the last  pressed button anymore, so we need to reset variable flag to origin state
   }
 }
 
@@ -456,7 +437,7 @@ function clearDisplay() {
 
 function resetOperationState() {
   mathOperationBtnIsLastPressed = false;
-  mathOperationCode = '';
+  operator = '';
 }
 
 function accumulateDigitsOnDisplay(digitValue) {
@@ -550,25 +531,25 @@ function updateMathOperationOptions(clickedSign) {
     'background-color: orange',
   );
   console.log(
-    `%cmathOperationCode ПЕРЕД ОБНОВЛЕННЯМ: ${mathOperationCode}`,
+    `%coperator ПЕРЕД ОБНОВЛЕННЯМ: ${operator}`,
 
     'background-color: orange',
   );
-  if (mathOperationCode === '^' && clickedSign === '-') {
+  if (operator === '^' && clickedSign === '-') {
     isNegativePower = true;
   } else if (
-    mathOperationCode !== '' &&
+    operator !== '' &&
     clickedSign === '√' &&
-    mathOperationCode !== clickedSign
+    operator !== clickedSign
   ) {
     mathOperationBtnIsLastPressed = true;
   } else {
     mathOperationBtnIsLastPressed = true;
-    mathOperationCode = clickedSign;
+    operator = clickedSign;
   }
 
   console.log(
-    `'%cmathOperationCode ПІСЛЯ ОБНОВЛЕННЯ: ${mathOperationCode}`,
+    `'%coperator ПІСЛЯ ОБНОВЛЕННЯ: ${operator}`,
 
     'background-color: orange; font-weight: 900',
   );
@@ -582,7 +563,7 @@ function getNumber1() {
 function getNumber2() {
   console.log('in getNumber2 savedNumber2: ', savedNumber2);
   let num;
-  if (mathOperationCode === '%' && !savedNumber2) {
+  if (operator === '%' && !savedNumber2) {
     num = 1;
   } else {
     num = Number(savedNumber2);
@@ -692,37 +673,27 @@ function squareRoot(number1, number2) {
 
 // ________________________________________UNIQUE MATH CASES FUNCTIONS ________________//
 function isInvalidPercentOrPowerOperation(clickedSign) {
-  return (
-    mathOperationCode !== '' && (clickedSign === '%' || clickedSign === '^')
-  );
+  return operator !== '' && (clickedSign === '%' || clickedSign === '^');
 }
 
 function isOperationWithoutFirstOperand(clickedSign) {
-  return mathOperationCode === '' && clickedSign !== '√' && !savedNumber1;
+  return operator === '' && clickedSign !== '√' && !savedNumber1;
 }
 
 function isOperationWithoutSecondOperand() {
   return (
-    standardOperationsList.includes(mathOperationCode) &&
-    mathOperationBtnIsLastPressed
+    standardOperationsList.includes(operator) && mathOperationBtnIsLastPressed
   );
 }
 
 function isSquareRootOperation(clickedSign) {
-  console.log('iS ROOT present on: clickedSign: ', clickedSign);
-  console.log('IS ROOT preset on: mathOperationCode: ', mathOperationCode);
-  return (
-    mathOperationCode &&
-    clickedSign === '√' &&
-    mathOperationCode !== clickedSign
-  );
+  return operator && clickedSign === '√' && operator !== clickedSign;
 }
 
 function isRootTheFirstOnDisplay(clickedSign) {
   console.log('iS ROOT FIRST on: clickedSign: ', clickedSign);
-  console.log('iS ROOT FIRST  on: mathOperationCode: ', mathOperationCode);
+  console.log('iS ROOT FIRST  on: operator: ', operator);
   return getFirstCharacter(displayEl.value) === '√';
-  //   return mathOperationCode === '' && clickedSign === '√';
 }
 
 function makeSqrRootOperation(value1, value2) {
@@ -735,7 +706,7 @@ function makeSqrRootOperation(value1, value2) {
     'background-color: #7ECCEC; font-weight:700',
   );
   console.log(
-    `%cin makeSqrRootOperation АКТИВНА ОПЕРАЦІЯ :${mathOperationCode}`,
+    `%cin makeSqrRootOperation АКТИВНА ОПЕРАЦІЯ :${operator}`,
     'background-color: #7ECCEC; font-weight:700',
   );
 
@@ -747,7 +718,7 @@ function makeSqrRootOperation(value1, value2) {
       `%cрозрахований корінь ПЕРШОГО операнда:${number1}`,
       'background-color: #7ECCEC; font-weight:500',
     );
-    result = calculateResult(number1, value2, mathOperationCode);
+    result = calculateResult(number1, value2, operator);
     savedNumber1 = result;
   } else {
     const number2 = calculateResult(0, value2, '√');
@@ -759,7 +730,7 @@ function makeSqrRootOperation(value1, value2) {
       result = 'ERROR';
       savedNumber1 = '';
     } else {
-      result = calculateResult(value1, number2, mathOperationCode);
+      result = calculateResult(value1, number2, operator);
       savedNumber1 = result;
     }
   }
@@ -782,10 +753,10 @@ function makeNotRootOperation(value1, value2) {
     'background-color: #CC99FF; font-weight:700',
   );
   console.log(
-    `%cin makeNotRootOperation АКТИВНА ОПЕРАЦІЯ :${mathOperationCode}`,
+    `%cin makeNotRootOperation АКТИВНА ОПЕРАЦІЯ :${operator}`,
     'background-color: #CC99FF; font-weight:700',
   );
-  const result = calculateResult(value1, value2, mathOperationCode);
+  const result = calculateResult(value1, value2, operator);
 
   console.log(
     `%cрезультат розрахунку, коли на екрані НЕМАЄ кореня:${result}`,
@@ -796,23 +767,14 @@ function makeNotRootOperation(value1, value2) {
   savedNumber2 = '';
 }
 
-function handleSquareRootDisplay(clickedSign) {
-  console.log(
-    'тут треба зробити операцію із першим числом та результатом кореня другого',
-  );
-  console.log('savedNumber1: ', savedNumber1);
-  console.log(' savedNumber2: ', savedNumber2);
-  updateDisplayResult(`${savedNumber1}${mathOperationCode}${clickedSign}`);
-}
-
-function handleDisplayIfRootIsFirst(clickedSign) {
-  console.log(
-    'тут треба зробити операцію із результатом кореня першого числа та другим числом',
-  );
-  console.log('if √ - FIRST  savedNumber1: ', savedNumber1);
-  console.log(' if √ - FIRST savedNumber2: ', savedNumber2);
-  updateDisplayResult(`${displayEl.value}${clickedSign}`);
-}
+// function handleDisplayIfRootIsFirst(clickedSign) {
+//   console.log(
+//     'тут треба зробити операцію із результатом кореня першого числа та другим числом',
+//   );
+//   console.log('if √ - FIRST  savedNumber1: ', savedNumber1);
+//   console.log(' if √ - FIRST savedNumber2: ', savedNumber2);
+//   updateDisplayResult(`${displayEl.value}${clickedSign}`);
+// }
 
 function handleFirstDigitClick(digitValue) {
   savedNumber1 = digitValue;
@@ -820,8 +782,8 @@ function handleFirstDigitClick(digitValue) {
 }
 
 function makeOperWithTwoOperands(value1, value2) {
-  console.log('Знак коли тисну "=": ', mathOperationCode);
-  if (mathOperationCode !== '') {
+  console.log('Знак коли тисну "=": ', operator);
+  if (operator !== '') {
     const isRootOnDispay = checkIfRootOperationStarted();
     console.log('є корінь коли тисну "="? ', isRootOnDispay);
     if (isRootOnDispay) {
