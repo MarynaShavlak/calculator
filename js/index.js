@@ -154,55 +154,100 @@ function handleDecimalInSecondOperand() {
 
 //_____________________________________________________________
 function checkIfMathOperationStarted() {
-  let isSignBefore = false;
-  let firstDisplayElement;
-  firstDisplayElement = getFirstCharacter(displayEl.value);
+  let firstDisplayElement = getFirstCharacter(displayEl.value);
   console.log('firstDisplayElement : ', firstDisplayElement);
   if (firstDisplayElement === '(') {
     console.log('перевырка операції: тут ДУЖКА');
-    firstDisplayElement = getSecondCharacter(displayEl.value);
-    console.log('firstDisplayElemente: ', firstDisplayElement);
-    if (firstDisplayElement === '√') {
-      return true;
-    } else if (firstDisplayElement !== '√') {
-      const value = displayEl.value;
-      for (let i = 2; i < value.length; i++) {
-        if (fullOperationsList.includes(value[i])) {
-          isSignBefore = true;
-          break;
-        }
-      }
-      return isSignBefore;
-    }
+    return checkMathOperationAfterBracket();
+    // firstDisplayElement = getSecondCharacter(displayEl.value);
+    // console.log('firstDisplayElemente: ', firstDisplayElement);
+    // if (firstDisplayElement === '√') {
+    //   return true;
+    // } else if (firstDisplayElement !== '√') {
+    //   const value = displayEl.value;
+    //   for (let i = 2; i < value.length; i++) {
+    //     if (fullOperationsList.includes(value[i])) {
+    //       isSignBefore = true;
+    //       break;
+    //     }
+    //   }
+    //   return isSignBefore;
+    // }
   } else {
     console.log('перевырка операції: тут ДУЖКИ НЕМАЄ');
-    console.log('firstDisplayElemente: ', firstDisplayElement);
-    if (firstDisplayElement === '√') {
-      return true;
-    } else if (firstDisplayElement !== '√') {
-      const value = displayEl.value;
-      for (let i = 1; i < value.length; i++) {
-        if (fullOperationsList.includes(value[i])) {
-          isSignBefore = true;
-          break;
-        }
-      }
-      return isSignBefore;
-    }
+    return checkMathOperationWithoutBracket();
+    // console.log('firstDisplayElemente: ', firstDisplayElement);
+    // if (firstDisplayElement === '√') {
+    //   return true;
+    // } else if (firstDisplayElement !== '√') {
+    //   const value = displayEl.value;
+    //   for (let i = 1; i < value.length; i++) {
+    //     if (fullOperationsList.includes(value[i])) {
+    //       isSignBefore = true;
+    //       break;
+    //     }
+    //   }
+    //   return isSignBefore;
+    // }
   }
-  //   console.log('firstDisplayElemente: ', firstDisplayElement);
-  //   if (firstDisplayElement === '√') {
-  //     return true;
-  //   } else if (firstDisplayElement !== '√') {
+}
+
+function checkMathOperationAfterBracket() {
+  const firstDisplayElement = getSecondCharacter(displayEl.value);
+  console.log('firstDisplayElemente: ', firstDisplayElement);
+  if (firstDisplayElement === '√') {
+    return true;
+  } else {
+    checkForOperation();
+    // const value = displayEl.value;
+    // for (let i = 2; i < value.length; i++) {
+    //   if (fullOperationsList.includes(value[i])) {
+    //     isSignBefore = true;
+    //     break;
+    //   }
+    // }
+    // return isSignBefore;
+  }
+}
+
+function checkMathOperationWithoutBracket() {
+  const firstDisplayElement = getFirstCharacter(displayEl.value);
+  console.log('firstDisplayElemente: ', firstDisplayElement);
+  if (firstDisplayElement === '√') {
+    return true;
+  } else {
+    // const value = displayEl.value;
+    // for (let i = 1; i < value.length; i++) {
+    //   if (fullOperationsList.includes(value[i])) {
+    //     isSignBefore = true;
+    //     break;
+    //   }
+    // }
+    // return isSignBefore;
+    return checkForOperation();
+  }
+}
+
+function checkForOperation() {
   //     const value = displayEl.value;
-  //     for (let i = 1; i < value.length; i++) {
-  //       if (fullOperationsList.includes(value[i])) {
-  //         isSignBefore = true;
-  //         break;
-  //       }
+  //     const startIndex = value[0] === '(' ? 2 : 1;
+  //   let isSignBefore = false;
+
+  //   for (let i = startIndex; i < value.length; i++) {
+  //     if (fullOperationsList.includes(value[i])) {
+  //       isSignBefore = true;
+  //       break;
   //     }
-  //     return isSignBefore;
   //   }
+
+  //   return isSignBefore;
+  const value = displayEl.value;
+  const startIndex = value.startsWith('(') ? 2 : 1;
+
+  return value
+    .slice(startIndex)
+    .split('')
+    .some(char => fullOperationsList.includes(char));
 }
 
 function checkIfNotRootOperationStarted() {
@@ -438,6 +483,7 @@ function accumulateDigitsOnDisplay(digitValue) {
 
 function accululateWithOperSign(digitValue) {
   console.log('АКАМУЛЮЭМО ЦИФРЫ В ЧИСЛО НОМЕР 2 ');
+  let accamulatedValue;
   accamulatedValue = savedNumber2 + digitValue;
   const res = processAccumulatedValue(accamulatedValue);
   savedNumber2 = res;
