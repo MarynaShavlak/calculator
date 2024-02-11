@@ -13,7 +13,10 @@ import {
 } from './utils.js';
 import { processWithinLimits } from './digits-limits-functions.js';
 import { addBtsEventHandlers } from './events.js';
-import { calculateResult } from './math-operation-funcs.js';
+import {
+  calculateResult,
+  updatePowerSettings,
+} from './math-operation-funcs.js';
 
 const display = document.querySelector('#main-calc-display');
 const fullOperationsList = ['-', '+', '*', '/', '√', '%', '^'];
@@ -31,7 +34,7 @@ export function resetCalculator() {
   operator = '';
   updateOperand1('');
   updateOperand2('');
-  isNegativePower = false;
+  updatePowerSettings(false);
 }
 
 export function onDelBtnPress() {
@@ -298,7 +301,7 @@ function resetOperatorSettings() {
 
 function updateOperatorSettings(clickedSign) {
   if (operator === '^' && clickedSign === '-') {
-    isNegativePower = true;
+    updatePowerSettings(true);
   } else if (
     operator !== '' &&
     clickedSign === '√' &&

@@ -98,3 +98,7 @@ function squareRoot(number1, number2) {
     return roundResult(squareRootValue);
   }
 }
+
+export function updatePowerSettings(value) {
+  isNegativePower = value;
+}
