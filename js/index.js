@@ -114,9 +114,23 @@ function canCreateFloatSecondOperand() {
   return !savedNumber2 && isSignBefore;
 }
 function canAddDotInFirstOperand() {
+  console.log('значення на дісплеї', displayEl.value);
   const isDotSeparatorInFirstNumber =
     savedNumber1 && String(savedNumber1).includes('.');
+  const isRootFirstonDisplay = isRootTheFirstOnDisplay();
+  console.log(
+    'кОЛИ КЛЫКАЮ НА КРАПКУ, ЧИ починаэться вираз із кореня isRootFirstonDisplay: ',
+    isRootFirstonDisplay,
+  );
+  if (isRootFirstonDisplay) {
+    savedNumber1 = '0';
+    return true;
+  }
   const isSignBefore = checkIfMathOperationStarted();
+  console.log(
+    'кОЛИ КЛЫКАЮ НА КРАПКУ, ЧИ Є ЯКИЙСЬ ЗНАК ПОПЕРЕДУ isSignBefore: ',
+    isSignBefore,
+  );
   return !isDotSeparatorInFirstNumber && !savedNumber2 && !isSignBefore;
 }
 
@@ -294,23 +308,11 @@ function onMathOperationBtnPress(el) {
       for (let i = 1; i < displayEl.value.length; i++) {
         if (fullOperationsList.includes(displayEl.value[i])) {
           handleInvalidOperationsAfterRootSign();
-          return false; // String contains one of the forbidden operations
+          return false;
         }
       }
     }
 
-    // if (
-    //   displayEl.value.length === 2 &&
-    //   (displayEl.value === '√-' || displayEl.value === '√+')
-    // ) {
-    //   console.log('тут треба зміна знаку');
-    // } else if (
-    //   displayEl.value.length === 2 &&
-    //   !(displayEl.value === '√-' || displayEl.value === '√+')
-    // ) {
-    //   handleInvalidOperationsAfterRootSign();
-    //   return;
-    // }
     updateMathOperationOptions(clickedSign);
     console.log(
       `%cякий знак був ТЕПЕР записаний в КІНЦІ кліку?:  ${mathOperationCode}`,
