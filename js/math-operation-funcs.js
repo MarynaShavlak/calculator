@@ -1,5 +1,6 @@
 //__________________Mathematical calculation functions_____________________________
 import { roundResult } from './utils.js';
+let isNegativePower;
 export function calculateResult(number1, number2, operation) {
   let result;
 
