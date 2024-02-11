@@ -29,17 +29,27 @@ input {
   /* background-color: blue; */
 }
 .calculator--section {
-  padding-top: 150px;
+  padding-top: 50px;
   position: relative;
   height: 100vh;
   margin: 0 auto;
   overflow: hidden;
+}
+
+.title {
+  font-family: 'Exo 2', sans-serif;
+  text-align: center;
+  color: #fddb24;
 }
 @media screen and (min-width: 375px) {
   .container {
     width: 355px;
     padding-right: 10px;
     padding-left: 10px;
+  }
+  .title {
+    font-size: 20px;
+    margin-bottom: 20px;
   }
 }
 @media screen and (min-width: 768px) {
@@ -48,12 +58,20 @@ input {
     padding-right: 15px;
     padding-left: 15px;
   }
+  .title {
+    font-size: 26px;
+    margin-bottom: 30px;
+  }
 }
 @media screen and (min-width: 1200px) {
   .container {
     width: 1170px;
     padding-right: 15px;
     padding-left: 15px;
+  }
+  .title {
+    font-size: 70px;
+    margin-bottom: 40px;
   }
 }
 
@@ -139,7 +157,6 @@ input {
   text-align: right;
   background: #9ce9f6;
   border-radius: 20px;
-  padding: 10px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -268,6 +285,9 @@ input {
 }
 
 @media screen and (min-width: 768px) and (max-width: 1199px) {
+  .calculator--section {
+    padding-top: 50px;
+  }
   .error-notification-modal {
     padding: 30px;
     width: 500px;
@@ -378,6 +398,9 @@ input {
 }
 
 @media screen and (min-width: 1200px) {
+  .calculator--section {
+    padding-top: 60px;
+  }
   .copy-icon {
     font-size: 40px;
   }
@@ -391,9 +414,9 @@ input {
   }
   .calculator {
     display: grid;
-    grid-template-rows: 2fr 6fr;
-    width: 1000px;
-    height: 800px;
+    grid-template-rows: 1fr 6fr;
+    width: 1050px;
+    height: 750px;
   }
   .btn {
     font-size: 60px;

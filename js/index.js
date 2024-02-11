@@ -17,6 +17,7 @@ import {
   calculateResult,
   updatePowerSettings,
 } from './math-operation-funcs.js';
+import { typeEffect } from './interface.js';
 
 const display = document.querySelector('#main-calc-display');
 const fullOperationsList = ['-', '+', '*', '/', '√', '%', '^'];
@@ -27,6 +28,7 @@ let operand1 = '';
 let operand2 = '';
 
 addBtsEventHandlers();
+typeEffect();
 
 export function resetCalculator() {
   updateDisplayResult(0);
