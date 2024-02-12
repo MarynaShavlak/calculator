@@ -173,7 +173,9 @@ function getNumber2() {
 function makeOperWithTwoOperands(value1, value2) {
   if (operator !== '') {
     const isRootOnDispay = hasRootSignInFirstOperand();
-    if (isRootOnDispay) {
+    const isRootInSecondOperand =
+      display.value.includes('√') && operator !== '√';
+    if (isRootOnDispay || isRootInSecondOperand) {
       makeSqrRootOperation(value1, value2);
     } else {
       makeNotRootOperation(value1, value2);
