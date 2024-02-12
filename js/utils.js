@@ -20,3 +20,13 @@ export function getSecondCharacter(str) {
 export function roundResult(value) {
   return Math.round(value * ROUNDING_PRECISION) / ROUNDING_PRECISION;
 }
+
+export function countCharacter(str, char) {
+  let count = 0;
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === char) {
+      count++;
+    }
+  }
+  return count;
+}

@@ -10,6 +10,7 @@ import {
   getFirstCharacter,
   getSecondCharacter,
   getLastCharacter,
+  countCharacter,
 } from './utils.js';
 import { processWithinLimits } from './digits-limits-functions.js';
 import { addBtsEventHandlers } from './events.js';
@@ -182,7 +183,13 @@ function makeOperWithTwoOperands(value1, value2) {
 function makeSqrRootOperation(value1, value2) {
   let result;
   const isRootFirstOnDisplay = displayStartsWithRootSign();
-  if (isRootFirstOnDisplay) {
+  const rootsQuantity = countCharacter(display.value, '√');
+  if (rootsQuantity === 2) {
+    const number1 = calculateResult(0, value1, '√');
+    const number2 = calculateResult(0, value2, '√');
+    result = calculateResult(number1, number2, operator);
+    updateOperand1(result);
+  } else if (isRootFirstOnDisplay) {
     const number1 = calculateResult(0, value1, '√');
     result = calculateResult(number1, value2, operator);
     updateOperand1(result);
@@ -454,11 +461,14 @@ function checkIfNotRootOperationStarted() {
 }
 
 function hasRootSignInFirstOperand() {
-  return display.value.includes('√') && operator !== '√';
+  //   return display.value.includes('√') && operator !== '√';
+  return display.value.startsWith('√');
 }
 
 function checkForInvalidRootOperation() {
   const displayLength = display.value.length;
+  const rootsQuantity = countCharacter(display.value, '√');
+
   if (displayLength === 2) {
     for (let i = 1; i < displayLength; i++) {
       if (fullOperationsList.includes(display.value[i])) {
@@ -468,6 +478,10 @@ function checkForInvalidRootOperation() {
         return false;
       }
     }
+  } else if (rootsQuantity === 3) {
+    updateDisplayResult(`${deleteLastCharacter(display.value)}`);
+    showInvalidOperAfterRootSignNotification();
+    return false;
   }
   return true;
 }

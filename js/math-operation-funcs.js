@@ -86,6 +86,10 @@ function power(number1, number2) {
 function squareRoot(number1, number2) {
   if (number2 < 0) {
     return 'ERROR';
+  } else if (number2 === 0 && number1 === 0) {
+    return 0;
+  } else if (number1 > 0 && number2 === 0) {
+    return roundResult(number1);
   } else if (number1 > 0 && number2 > 0) {
     const squareRootValue = Math.sqrt(number2);
     return roundResult(multiply(number1, squareRootValue));
