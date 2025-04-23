@@ -60,12 +60,7 @@ function divide(number1, number2) {
 function percent(number1, number2) {
   const percentage = (number1 * number2) / 100;
   return roundResult(percentage);
-  //   if (number1 < 0) {
-  //     return 'ERROR';
-  //   } else {
-  //     const percentage = (number1 * number2) / 100;
-  //     return roundResult(percentage);
-  //   }
+
 }
 
 function power(number1, number2) {
