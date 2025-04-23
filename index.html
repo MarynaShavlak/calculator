@@ -1,148 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CalculatorUA</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Exo+2&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <link rel="stylesheet" href="css/index.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator UA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+          href="https://fonts.googleapis.com/css2?family=Exo+2&display=swap"
+          rel="stylesheet"
+  />
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+  />
+  <link rel="stylesheet" href="css/index.css" />
+</head>
 
-  <body>
+<body>
 
-    <section class="calculator--section">
-      <div class="container">
-        <h1 class="title">Calculator UA</h1>
-        <div class="calculator">
-          <div class="calc-screen">
-            <i class="fa-regular fa-copy copy-icon"></i>
-            <input
-              type="text"
-              class="calc-display"
-              id="main-calc-display"
-              readonly="readonly"
-            />
-          </div>
-          <div class="buttons-tablo">
-            <button
-              class="btn additional-operation-btn clearAll-btn"
-              id="clearAll-btn"
-              value="AC"
-            >
-              AC
-            </button>
-            <button
-              class="btn additional-operation-btn delete-btn"
-              id="delete-btn"
-              value="&#8656;"
-            >
-              <i class="fa-solid fa-delete-left"></i>
-            </button>
-            <button
-              class="btn math-operation-btn main-operation-btn devide-btn"
-              value="/"
-            >
-              &divide;
-            </button>
-            <button
-              class="btn math-operation-btn main-operation-btn multiply-btn"
-              value="*"
-            >
-              X
-            </button>
-            <button
-              class="btn math-operation-btn main-operation-btn plus-btn"
-              value="+"
-            >
-              +
-            </button>
-            <button
-              class="btn math-operation-btn main-operation-btn minus-btn"
-              value="-"
-            >
-              -
-            </button>
-            <button
-              class="btn math-operation-btn additional-operation-btn percent-btn"
-              value="%"
-            >
-              %
-            </button>
-            <button
-              class="btn math-operation-btn additional-operation-btn square-root-btn"
-              value="√"
-            >
-              &radic;
-            </button>
-            <button class="btn digit-btn btn-7" value="7">7</button>
-            <button class="btn digit-btn btn-8" value="8">8</button>
-            <button class="btn digit-btn btn-9" value="9">9</button>
-            <button
-              class="btn main-operation-btn result-operation-btn"
-              id="result-btn"
-              value="="
-            >
-              =
-            </button>
-            <button
-              class="btn math-operation-btn additional-operation-btn power-btn"
-              value="^"
-            >
-              ^
-            </button>
-            <button
-              class="btn additional-operation-btn switch-sign-btn"
-              id="switch-sign-btn"
-              value="+/-"
-            >
-              +/-
-            </button>
-            <button class="btn digit-btn btn-4" value="4">4</button>
-            <button class="btn digit-btn btn-5" value="5">5</button>
-            <button class="btn digit-btn btn-6" value="6">6</button>
-            <button class="btn digit-btn btn-0" value="0">0</button>
-            <button class="btn digit-btn btn-1" value="1">1</button>
-            <button class="btn digit-btn btn-2" value="2">2</button>
-            <button class="btn digit-btn btn-3" value="3">3</button>
-            <button
-              class="btn main-operation-btn decimal-btn"
-              id="decimal-btn"
-              value="."
-            >
-              .
-            </button>
-          </div>
-        </div>
-
-        <div class="error-notification-modal" role="dialog">
-          <img
-            class="error-notification-img"
-            src="./images/patron.png"
-            alt="photo of dog Patron"
-          />
-          <div class="error-notification-block">
-            <p class="error-notification-text">Невірний формат операції:</p>
-            <p class="error-notification-message"></p>
-          </div>
-        </div>
+<main class="calculator--section">
+  <div class="container">
+    <header>
+      <h1 class="title">Calculator UA</h1>
+    </header>
+    <section class="calculator">
+      <div class="calc-screen">
+        <button aria-label="Copy to clipboard" class="copy-btn"> <i class="fa-regular fa-copy copy-icon"></i></button>
+        <input
+                type="text"
+                class="calc-display"
+                id="main-calc-display"
+                readonly
+                aria-label="Calculator display"
+        />
+      </div>
+      <div class="buttons-tablo">
+        <button class="btn additional-operation-btn clearAll-btn" id="clearAll-btn" value="AC" aria-label="Clear all">AC</button>
+        <button class="btn additional-operation-btn delete-btn" id="delete-btn" value="&#8656;" aria-label="Delete last character">
+          <i class="fa-solid fa-delete-left"></i>
+        </button>
+        <button class="btn math-operation-btn main-operation-btn devide-btn" value="/" aria-label="Divide">
+          &divide;
+        </button>
+        <button class="btn math-operation-btn main-operation-btn multiply-btn" value="*" aria-label="Multiply">
+          X
+        </button>
+        <button class="btn math-operation-btn main-operation-btn plus-btn" value="+" aria-label="Add">
+          +
+        </button>
+        <button class="btn math-operation-btn main-operation-btn minus-btn" value="-" aria-label="Subtract">
+          -
+        </button>
+        <button class="btn math-operation-btn additional-operation-btn percent-btn" value="%" aria-label="Percent">
+          %
+        </button>
+        <button class="btn math-operation-btn additional-operation-btn square-root-btn" value="√" aria-label="Square root">
+          &radic;
+        </button>
+        <button class="btn digit-btn btn-7" value="7" aria-label="Seven">7</button>
+        <button class="btn digit-btn btn-8" value="8" aria-label="Eight">8</button>
+        <button class="btn digit-btn btn-9" value="9" aria-label="Nine">9</button>
+        <button class="btn main-operation-btn result-operation-btn" id="result-btn" value="=" aria-label="Equals">
+          =
+        </button>
+        <button class="btn math-operation-btn additional-operation-btn power-btn" value="^" aria-label="Power">
+          ^
+        </button>
+        <button class="btn additional-operation-btn switch-sign-btn" id="switch-sign-btn" value="+/-" aria-label="Switch sign">
+          &plus;/&minus;
+        </button>
+        <button class="btn digit-btn btn-4" value="4" aria-label="Four">4</button>
+        <button class="btn digit-btn btn-5" value="5" aria-label="Five">5</button>
+        <button class="btn digit-btn btn-6" value="6" aria-label="Six">6</button>
+        <button class="btn digit-btn btn-0" value="0" aria-label="Zero">0</button>
+        <button class="btn digit-btn btn-1" value="1" aria-label="One">1</button>
+        <button class="btn digit-btn btn-2" value="2" aria-label="Two">2</button>
+        <button class="btn digit-btn btn-3" value="3" aria-label="Three">3</button>
+        <button class="btn main-operation-btn decimal-btn" id="decimal-btn" value="." aria-label="Decimal point">
+          .
+        </button>
       </div>
     </section>
 
-    <script src="js/index.js" type="module"></script>
-    <script src="js/notifications.js" type="module"></script>
+    <div class="error-notification-modal" role="dialog" aria-live="assertive">
+      <img
+              class="error-notification-img"
+              src="./images/patron.png"
+              alt="Photo of dog Patron"
+      />
+      <div class="error-notification-block">
+        <p class="error-notification-text">Невірний формат операції:</p>
+        <p class="error-notification-message"></p>
+      </div>
+    </div>
+  </div>
+</main>
 
-  </body>
+<script src="js/index.js" type="module"></script>
+<script src="js/notifications.js" type="module"></script>
+
+</body>
 </html>
